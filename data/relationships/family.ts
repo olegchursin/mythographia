@@ -1,0 +1,165 @@
+import { children, rel, type RelOpts, type RelSeed } from "../types";
+
+const hes = (cite?: string, extra: RelOpts = {}): RelOpts => ({ t: "hesiodic", s: "theogony", cite, ...extra });
+const hom = (s: "iliad" | "odyssey" | "homeric-hymns", cite?: string, extra: RelOpts = {}): RelOpts => ({ t: "homeric", s, cite, ...extra });
+const apd = (cite?: string, extra: RelOpts = {}): RelOpts => ({ t: "apollodoran", s: "bibliotheca", cite, ...extra });
+const hyg = (cite?: string, extra: RelOpts = {}): RelOpts => ({ t: "hyginian", s: "fabulae", cite, ...extra });
+const variant = (o: RelOpts, note?: string): RelOpts => ({ ...o, cert: "variant", note });
+
+export const family: RelSeed[] = [
+  // ── Primordials ─────────────────────────────────────────────
+  ...children(["chaos"], ["erebus", "nyx"], hes("Theogony 123")),
+  ...children(["nyx", "erebus"], ["aether", "hemera"], hes("Theogony 124–125")),
+  ...children(["gaia"], ["uranus", "pontus", "ourea"], hes("Theogony 126–132", { note: "Born from Gaia alone, without a partner." })),
+  ...children(["chronos", "ananke"], ["phanes"], variant({ t: "orphic", s: "orphic-fragments", cite: "Orphic Rhapsodies" }, "Hatched from the cosmic egg fashioned by Time.")),
+  ...children(["chronos"], ["aether", "chaos"], variant({ t: "orphic", s: "orphic-fragments" }, "In Orphic cosmogony Time comes first, and Chaos is his child.")),
+  ...children(["phanes"], ["nyx"], variant({ t: "orphic", s: "orphic-fragments" }, "Night is the daughter (and consort) of Phanes in the Rhapsodies.")),
+  ...children(["aether", "hemera"], ["thalassa"], variant(hyg("Fabulae, Preface"))),
+  ...children(["gaia", "tartarus"], ["typhon"], hes("Theogony 820–822")),
+  ...children(["hera"], ["typhon"], variant(hom("homeric-hymns", "Hymn to Apollo 305–355"), "Hera bore Typhon alone, furious that Zeus had produced Athena without her.")),
+
+  // Nyx's brood
+  ...children(["nyx"], ["thanatos", "hypnos", "momos", "oizys", "nemesis", "eris", "geras", "apate", "philotes", "moros", "keres", "oneiroi", "hesperides"], hes("Theogony 211–225", { note: "Born from Night alone." })),
+  ...children(["nyx"], ["clotho", "lachesis", "atropos"], variant(hes("Theogony 217"), "Early in the Theogony the Fates are daughters of Night alone.")),
+  ...children(["zeus", "themis"], ["clotho", "lachesis", "atropos"], variant(hes("Theogony 901–906"), "Later in the same poem they are daughters of Zeus and Themis; the Theogony preserves both genealogies.")),
+  ...children(["ananke"], ["clotho", "lachesis", "atropos"], variant({ s: "plato", cite: "Republic 617c" }, "Plato makes the Fates daughters of Necessity.")),
+  ...children(["hypnos"], ["morpheus"], { t: "roman", s: "metamorphoses", cite: "Metamorphoses 11.633" }),
+
+  // ── Titans ──────────────────────────────────────────────────
+  ...children(["gaia", "uranus"], ["oceanus", "coeus", "crius", "hyperion", "iapetus", "theia", "rhea", "themis", "mnemosyne", "phoebe", "tethys", "cronus"], hes("Theogony 133–138")),
+  ...children(["gaia", "uranus"], ["brontes", "steropes", "arges"], hes("Theogony 139–146")),
+  ...children(["gaia", "uranus"], ["hecatoncheires"], hes("Theogony 147–153")),
+  ...children(["gaia"], ["giants", "erinyes"], hes("Theogony 183–187", { note: "Sprung from the blood of Uranus falling on the Earth." })),
+  ...children(["uranus"], ["giants", "erinyes"], hes("Theogony 183–187", { note: "Born from his blood after the castration." })),
+  ...children(["oceanus", "tethys"], ["metis", "eurynome", "clymene", "styx", "dione", "tyche", "oceanids", "achelous", "scamander", "alpheus", "peneus", "inachus", "asopus", "calypso"], hes("Theogony 337–370")),
+  ...children(["atlas"], ["calypso"], variant(hom("odyssey", "Odyssey 1.52"), "Homer calls Calypso the daughter of Atlas.")),
+  ...children(["hyperion", "theia"], ["helios", "selene", "eos"], hes("Theogony 371–374")),
+  ...children(["coeus", "phoebe"], ["leto", "asteria"], hes("Theogony 404–410")),
+  ...children(["pontus", "gaia"], ["nereus", "phorcys", "ceto", "eurybia"], hes("Theogony 233–239")),
+  ...children(["crius", "eurybia"], ["astraeus", "pallas", "perses"], hes("Theogony 375–377")),
+  ...children(["iapetus", "clymene"], ["atlas", "menoetius", "prometheus", "epimetheus"], hes("Theogony 507–511")),
+  ...children(["pallas", "styx"], ["nike", "kratos", "bia", "zelus"], hes("Theogony 383–385")),
+  ...children(["perses", "asteria"], ["hecate"], hes("Theogony 409–411")),
+  ...children(["astraeus", "eos"], ["boreas", "zephyrus"], hes("Theogony 378–380")),
+  ...children(["eos"], ["memnon"], hes("Theogony 984", { s: "theogony" })),
+  ...children(["atlas"], ["maia", "pleiades"], apd("Bibliotheca 3.10.1")),
+  ...children(["atlas"], ["hesperides"], variant({ s: "diodorus", cite: "Library 4.27" }, "Diodorus makes the Hesperides daughters of Atlas rather than Night.")),
+  ...children(["helios"], ["circe", "aeetes", "pasiphae"], hom("odyssey", "Odyssey 10.135–139")),
+  ...children(["nereus"], ["thetis", "amphitrite", "galatea", "nereids"], hes("Theogony 240–264")),
+  ...children(["phorcys", "ceto"], ["medusa", "stheno", "euryale", "graeae", "ladon", "echidna"], hes("Theogony 270–336")),
+  ...children(["phorcys"], ["scylla"], apd("Epitome 7.20", { cert: "variant" })),
+
+  // ── Children of Cronus ──────────────────────────────────────
+  ...children(["cronus", "rhea"], ["hestia", "demeter", "hera", "hades", "poseidon", "zeus"], hes("Theogony 453–458")),
+  ...children(["cronus"], ["chiron"], apd("Bibliotheca 1.2.4", { note: "By the Oceanid Philyra, while in the shape of a horse." })),
+
+  // Aphrodite: two rival genealogies
+  ...children(["uranus"], ["aphrodite"], hes("Theogony 188–206", { note: "Born from the sea foam where Uranus's severed genitals fell, off Cythera." })),
+  ...children(["zeus", "dione"], ["aphrodite"], variant(hom("iliad", "Iliad 5.370–417"), "In the Iliad she runs to her mother Dione after Diomedes wounds her.")),
+
+  // Eros
+  ...children(["aphrodite", "ares"], ["eros"], variant({ t: "local", s: "pausanias", cite: "cf. Simonides fr. 575" }, "Later poets make Eros the son of Aphrodite, usually by Ares. In Hesiod he is a primordial who simply appears.")),
+
+  // ── Children of Zeus (divine) ───────────────────────────────
+  ...children(["zeus", "hera"], ["ares", "hebe", "eileithyia"], hes("Theogony 921–923")),
+  ...children(["zeus", "hera"], ["hephaestus"], variant(hom("iliad", "Iliad 1.577–579"), "Homer's Hephaestus calls Zeus his father.")),
+  ...children(["hera"], ["hephaestus"], variant(hes("Theogony 927–929"), "Hera bore him alone, without Zeus, in anger at the birth of Athena.")),
+  ...children(["zeus", "metis"], ["athena"], hes("Theogony 886–900, 924", { note: "Zeus swallowed the pregnant Metis; Athena emerged from his head." })),
+  ...children(["zeus", "leto"], ["apollo", "artemis"], hes("Theogony 918–920")),
+  ...children(["zeus", "maia"], ["hermes"], hom("homeric-hymns", "Hymn to Hermes 1–9")),
+  ...children(["zeus", "semele"], ["dionysus"], hes("Theogony 940–942")),
+  ...children(["zeus", "persephone"], ["dionysus"], variant({ t: "orphic", s: "orphic-fragments" }, "The Orphic Dionysus-Zagreus is a son of Zeus and Persephone, torn apart by Titans and reborn.")),
+  ...children(["zeus", "demeter"], ["persephone"], hes("Theogony 912–914")),
+  ...children(["zeus", "mnemosyne"], ["calliope", "clio", "erato", "euterpe", "melpomene", "polyhymnia", "terpsichore", "thalia", "urania"], hes("Theogony 53–79, 915–917")),
+  ...children(["zeus", "themis"], ["eunomia", "dike", "eirene"], hes("Theogony 901–903")),
+  ...children(["zeus", "eurynome"], ["aglaea", "euphrosyne", "thalia-grace"], hes("Theogony 907–911")),
+  ...children(["hermes"], ["pan"], hom("homeric-hymns", "Hymn to Pan 1–5")),
+  ...children(["ares", "aphrodite"], ["harmonia", "phobos", "deimos"], hes("Theogony 933–937")),
+  ...children(["apollo"], ["asclepius", "orpheus"], { s: "pindar", cite: "Pythian 3 (Asclepius); Pythian 4.176 (Orpheus)" }),
+  ...children(["calliope"], ["orpheus"], apd("Bibliotheca 1.3.2")),
+  ...children(["dionysus", "aphrodite"], ["charites"], variant({ t: "local", s: "pausanias" }, "A rival genealogy for the Graces.")),
+
+  // ── Children of Zeus (mortal lines) ─────────────────────────
+  ...children(["zeus", "alcmene"], ["heracles"], hom("iliad", "Iliad 14.323–324")),
+  ...children(["zeus", "danae"], ["perseus"], hom("iliad", "Iliad 14.319–320")),
+  ...children(["zeus", "leda"], ["helen", "pollux"], apd("Bibliotheca 3.10.7")),
+  ...children(["zeus", "nemesis"], ["helen"], variant({ t: "epic-cycle", s: "epic-cycle", cite: "Cypria fr. 9" }, "In the Cypria, Nemesis laid the egg; Leda found it and raised Helen as her own.")),
+  ...children(["tyndareus", "leda"], ["castor", "clytemnestra"], apd("Bibliotheca 3.10.7")),
+  ...children(["zeus", "europa"], ["minos", "rhadamanthus"], hom("iliad", "Iliad 14.321–322")),
+  ...children(["zeus", "europa"], ["sarpedon"], variant(apd("Bibliotheca 3.1.1"), "Apollodorus makes Sarpedon a son of Europa and brother of Minos.")),
+  ...children(["zeus"], ["sarpedon"], variant(hom("iliad", "Iliad 6.198–199"), "Homer's Sarpedon is a son of Zeus and Laodamia, daughter of Bellerophon, and so belongs to a later generation.")),
+  ...children(["zeus", "aegina"], ["aeacus"], apd("Bibliotheca 3.12.6")),
+  ...children(["zeus", "antiope"], ["amphion", "zethus"], hom("odyssey", "Odyssey 11.260–265")),
+  ...children(["zeus", "io"], ["epaphus"], apd("Bibliotheca 2.1.3")),
+  ...children(["zeus"], ["tantalus"], apd("Epitome 2.1", { cert: "variant" })),
+  ...children(["asopus"], ["aegina", "antiope"], apd("Bibliotheca 3.12.6")),
+  ...children(["inachus"], ["io"], apd("Bibliotheca 2.1.3")),
+  ...children(["peneus"], ["daphne"], { t: "roman", s: "metamorphoses", cite: "Metamorphoses 1.452" }),
+  ...children(["acrisius"], ["danae"], apd("Bibliotheca 2.2.2")),
+  ...children(["cadmus", "harmonia"], ["semele"], hes("Theogony 975–978")),
+  ...children(["amphitryon", "alcmene"], ["iolaus"], apd("Bibliotheca 2.4.11", { cert: "variant", note: "Strictly their grandson, the son of Iphicles; simplified here to one generation." })),
+
+  // ── Poseidon's network ──────────────────────────────────────
+  ...children(["poseidon", "amphitrite"], ["triton", "rhode", "benthesikyme"], hes("Theogony 930–933", { note: "Hesiod names only Triton; Rhode and Benthesikyme are added by Apollodorus (Bibliotheca 1.4.5, 3.15.4)." })),
+  ...children(["poseidon"], ["cymopoleia"], hes("Theogony 819")),
+  ...children(["poseidon"], ["polyphemus"], hom("odyssey", "Odyssey 1.68–73")),
+  ...children(["poseidon", "medusa"], ["pegasus", "chrysaor"], hes("Theogony 278–283", { note: "Sprang from Medusa's neck when Perseus beheaded her." })),
+  ...children(["poseidon"], ["neleus", "pelias"], hom("odyssey", "Odyssey 11.235–257")),
+  ...children(["poseidon"], ["theseus"], variant({ t: "local", s: "bibliotheca", cite: "Bacchylides 17; Bibliotheca 3.15.7" }, "Poseidon visited Aethra the same night as Aegeus.")),
+  ...children(["aegeus"], ["theseus"], variant(apd("Bibliotheca 3.15.6–7"), "The Athenian royal version: son of King Aegeus and Aethra.")),
+  ...children(["poseidon"], ["orion"], variant(apd("Bibliotheca 1.4.3"), "Son of Poseidon and Euryale daughter of Minos; hence he could walk on water.")),
+  ...children(["gaia"], ["orion"], variant(hyg("Fabulae 195"), "Born from a buried ox-hide on which Zeus, Poseidon and Hermes had urinated, a story explaining his name.")),
+  ...children(["poseidon", "demeter"], ["arion"], { t: "local", s: "pausanias", cite: "Description of Greece 8.25.5" }),
+  ...children(["poseidon", "gaia"], ["antaeus", "charybdis"], apd("Bibliotheca 2.5.11", { cert: "variant" })),
+  ...children(["poseidon"], ["bellerophon"], variant(hyg("Fabulae 157"))),
+  ...children(["neleus"], ["nestor"], hom("odyssey", "Odyssey 11.281–286")),
+
+  // ── Monsters' family tree ───────────────────────────────────
+  ...children(["typhon", "echidna"], ["cerberus", "orthrus", "hydra", "chimera"], hes("Theogony 306–325")),
+  ...children(["typhon", "echidna"], ["sphinx", "nemean-lion", "colchian-dragon", "crommyonian-sow"], apd("Bibliotheca 2.5.1, 3.5.8; Epitome 1.1")),
+  ...children(["orthrus"], ["sphinx", "nemean-lion"], variant(hes("Theogony 326–329"), "Hesiod makes them children of Orthrus (by Echidna or the Chimera — the Greek is ambiguous).")),
+  ...children(["typhon", "echidna"], ["ladon"], variant(apd("Bibliotheca 2.5.11"))),
+  ...children(["chrysaor"], ["geryon"], hes("Theogony 287–288")),
+  ...children(["pasiphae", "cretan-bull"], ["minotaur"], apd("Bibliotheca 3.1.4")),
+  ...children(["gaia"], ["python"], hyg("Fabulae 140")),
+  ...children(["gaia"], ["alcyoneus", "porphyrion", "enceladus"], apd("Bibliotheca 1.6.1")),
+
+  // ── Heroic houses ───────────────────────────────────────────
+  ...children(["aeacus"], ["peleus", "telamon"], apd("Bibliotheca 3.12.6")),
+  ...children(["peleus", "thetis"], ["achilles"], hom("iliad", "Iliad 1.280; 18.432–435")),
+  ...children(["achilles"], ["neoptolemus"], hom("odyssey", "Odyssey 11.506–509")),
+  ...children(["telamon"], ["ajax-the-great"], hom("iliad", "Iliad 2.557")),
+  ...children(["laertes"], ["odysseus"], hom("odyssey", "Odyssey 16.118")),
+  ...children(["sisyphus"], ["odysseus"], variant({ t: "tragic", s: "sophocles", cite: "Philoctetes 417" }, "A taunt used by his enemies: that Sisyphus, not Laertes, was his real father.")),
+  ...children(["odysseus", "penelope"], ["telemachus"], hom("odyssey", "Odyssey 1.215")),
+  ...children(["perseus", "andromeda"], ["alcmene", "amphitryon", "eurystheus"], apd("Bibliotheca 2.4.5", { note: "Strictly grandchildren, through Electryon, Alcaeus and Sthenelus; simplified to one generation." })),
+  ...children(["cassiopeia"], ["andromeda"], apd("Bibliotheca 2.4.3")),
+  ...children(["minos", "pasiphae"], ["ariadne", "phaedra"], apd("Bibliotheca 3.1.2")),
+  ...children(["minos"], ["idomeneus"], hom("iliad", "Iliad 13.449–453", { note: "Strictly his grandson, through Deucalion; simplified to one generation." })),
+  ...children(["theseus", "hippolyta"], ["hippolytus"], apd("Epitome 1.16")),
+  ...children(["daedalus"], ["icarus"], apd("Epitome 1.12")),
+  ...children(["aeetes"], ["medea"], hes("Theogony 956–962")),
+  ...children(["tantalus"], ["pelops", "niobe"], apd("Epitome 2.3; Bibliotheca 3.5.6")),
+  ...children(["pelops"], ["atreus", "thyestes"], apd("Epitome 2.10")),
+  ...children(["atreus"], ["agamemnon", "menelaus"], hom("iliad", "Iliad 2.105–108")),
+  ...children(["thyestes"], ["aegisthus"], apd("Epitome 2.14")),
+  ...children(["agamemnon", "clytemnestra"], ["iphigenia", "electra", "orestes"], { t: "tragic", s: "oresteia" }),
+  ...children(["cadmus", "harmonia"], ["pentheus"], { t: "tragic", s: "euripides", cite: "Bacchae", note: "Strictly their grandson, through Agave; simplified to one generation." }),
+  ...children(["laius", "jocasta"], ["oedipus"], { t: "tragic", s: "oedipus-rex" }),
+  ...children(["oedipus", "jocasta"], ["antigone"], { t: "tragic", s: "oedipus-rex" }),
+  ...children(["priam", "hecuba"], ["hector", "paris", "cassandra", "helenus", "deiphobus", "troilus", "creusa"], hom("iliad", "Iliad 24.495–497")),
+  ...children(["apollo"], ["troilus"], variant(apd("Bibliotheca 3.12.5"), "Some say Hecuba bore Troilus to Apollo, not Priam.")),
+  ...children(["hector", "andromache"], ["astyanax"], hom("iliad", "Iliad 6.399–403")),
+  ...children(["anchises", "aphrodite"], ["aeneas"], hom("homeric-hymns", "Hymn to Aphrodite 196–199")),
+  ...children(["boreas"], ["zetes", "calais"], { s: "argonautica", cite: "Argonautica 1.211–223" }),
+  ...children(["ares"], ["penthesilea", "hippolyta"], apd("Epitome 5.1")),
+  ...children(["ares"], ["meleager"], variant(hyg("Fabulae 171"))),
+
+  rel("rhea", "raised", "zeus", hes("Theogony 477–484", { note: "Hid him in a Cretan cave and gave Cronus a swaddled stone instead." })),
+  rel("amalthea", "raised", "zeus", apd("Bibliotheca 1.1.6–7")),
+  rel("chiron", "raised", "achilles", apd("Bibliotheca 3.13.6")),
+  rel("chiron", "raised", "jason", { s: "pindar", cite: "Pythian 4.102–115" }),
+  rel("chiron", "raised", "asclepius", { s: "pindar", cite: "Pythian 3.5–7" }),
+  rel("amphitryon", "raised", "heracles", apd("Bibliotheca 2.4.8–9")),
+  rel("tyndareus", "raised", "helen", apd("Bibliotheca 3.10.7")),
+];

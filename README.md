@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mythographia
 
-## Getting Started
+**An encyclopedia of Greek myth**, built on a sourced relationship graph. Every god, hero, monster,
+place, event, artifact and text is an *entry*; every connection between them is a typed edge that
+records its tradition and citation. Greek myth has no canon, so when the ancients disagree
+(Aphrodite's parents, who killed Agamemnon, whether Atalanta sailed on the Argo) every version is
+kept side by side.
 
-First, run the development server:
+- **Entries** (`/wiki/zeus`) — lead summary, long-form article, infobox, genealogy by tradition, relations with citations, chronology, ancient sources, see-also
+- **Index** (`/a-z`) — A–Z with kind and type filters; ⌘K search over names and aliases (try "Jupiter")
+- **Family trees** (`/tree/achilles?t=homeric`) — three generations up, two down, switchable by tradition
+- **Relations diagram** (`/graph?focus=achilles`) — kin, consorts, conflicts and allies around one figure
+- **Kinship finder** (`/kinship?from=perseus&to=heracles`) — kinship term, lines of descent, shortest connection
+- **Traditions** and **Ancient sources** — every claim grouped by who made it, and where a tradition differs from the rest
+
+Stack: Next.js 16 (App Router, server components, statically prerendered), Tailwind 4, Motion, Bun. No database: the content is read-only, so the typed modules in `data/` are the data layer.
+
+## Run it
+
+Needs Node 20+ and [Bun](https://bun.sh). No services, no env vars.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
+bun install
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Editing the content
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The dataset lives in `data/` as plain TypeScript (≈400 entries, ≈1,300 relationships, ≈80 long articles):
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| File | What |
+| --- | --- |
+| `data/entities/*.ts` | every entry: name, type, epithet, aliases, domains, `summary` |
+| `data/articles/*.ts` | long-form article bodies keyed by slug |
+| `data/relationships/family.ts` | parentage, with rival traditions |
+| `data/relationships/relations.ts` | marriages and loves, conflicts, alliances |
+| `data/relationships/world.ts` | memberships, events, places, artifacts, texts |
+| `data/timelines.ts` | chronologies shown on entries |
+| `data/meta.ts` | relationship types, traditions, ancient sources |
 
-## Learn More
+Article bodies use a tiny dialect: paragraphs separated by blank lines, `## Headings`,
+`[[slug]]` / `[[slug|label]]` links and `*italic*`. Summaries and relationship notes accept the same links.
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+bun run validate   # check data/ for broken slugs, links, traditions and sources
+bun run test       # data integrity + graph/tree/parser tests (vitest — plain `bun test` would use Bun's own runner)
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The validator rejects unknown slugs (including inside `[[links]]`), missing summaries, duplicate or
+orphaned entries, and unknown traditions or sources.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+To record a rival account, add another edge with a different `t` (tradition), `s` (source) and
+`cert: "variant"`. `relationships` is deliberately not unique on (source, target, type).
 
-## Deploy on Vercel
+## Layout
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `src/lib/graph.ts` — pure graph code: perspective labels, shortest paths, kinship, family trees, radial layout
+- `src/lib/article.ts` — article dialect parser · `src/lib/profile.ts` — infobox and genealogy derivations · `src/lib/queries.ts` — shapes `data/` into the rows the pages read
+- `src/app/` — routes · `src/components/` — ArticleBody, Infobox, FamilyTree, EgoGraph, PathChain, ClaimsTable, CommandSearch
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+To deploy: `bun run build` on any Next.js host. Entries, traditions and sources are prerendered; the index, diagram, tree and kinship tools render on demand from memory.
