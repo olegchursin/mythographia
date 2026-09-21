@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "validate": "bun scripts/validate.ts"
+    "validate": "bun scripts/validate.ts && bun scripts/character-prompts.ts",
+    "prompts:generate": "bun scripts/generate-character-prompts.ts && bun scripts/character-prompts.ts",
+    "prompts:check": "bun scripts/character-prompts.ts"
   },
   "dependencies": {
     "motion": "^13.4.0",
