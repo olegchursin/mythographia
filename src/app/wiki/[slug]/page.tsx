@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ViewTransition } from "react";
@@ -82,7 +83,11 @@ export default async function ArticlePage({ params }: PageProps<"/wiki/[slug]">)
     <PageTransition>
     <article>
       <header className="relative mb-12 pb-10">
-        <div className="pointer-events-none absolute -top-10 right-0 select-none text-[13rem] leading-none opacity-[0.07] sm:text-[18rem]" aria-hidden>{entity.emoji}</div>
+        {entity.image ? (
+          <Image src={entity.image} alt="" width={640} height={600} sizes="(min-width: 640px) 420px, 260px" className="hero-art pointer-events-none absolute -top-6 right-0 h-[15rem] w-auto select-none sm:h-[21rem]" aria-hidden />
+        ) : (
+          <div className="pointer-events-none absolute -top-10 right-0 select-none text-[13rem] leading-none opacity-[0.07] sm:text-[18rem]" aria-hidden>{entity.emoji}</div>
+        )}
         <p className="label kicker">{entity.subtype} · {entity.kind}</p>
         <ViewTransition name={`entity-${slug}`} share="morph" default="none">
           <h1 className="display mt-4 inline-block text-gilded">{entity.name}</h1>
@@ -216,6 +221,7 @@ export default async function ArticlePage({ params }: PageProps<"/wiki/[slug]">)
             title={entity.name}
             subtitle={entity.epithet}
             glyph={entity.emoji}
+            image={entity.image}
             rows={[
               { label: "Type", value: <span className="capitalize">{entity.subtype}</span> },
               { label: "Also called", value: entity.aliases.length ? entity.aliases.join(", ") : null },

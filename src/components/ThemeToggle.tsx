@@ -16,6 +16,8 @@ export function ThemeToggle() {
     const apply = () => {
       if (next === "light") document.documentElement.dataset.theme = "light";
       else delete document.documentElement.dataset.theme;
+      // Keep the installed app's title/status bar in step with the page.
+      document.querySelector('meta[name="theme-color"]')?.setAttribute("content", next === "light" ? "#f7f3ea" : "#0a0908");
     };
     try {
       localStorage.setItem("theme", next);

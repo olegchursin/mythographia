@@ -19,6 +19,7 @@ export interface Entity {
   aliases: string[];
   summary: string | null;
   article: string | null;
+  image: string | null;
 }
 export type EntityLite = Pick<Entity, "slug" | "name" | "emoji" | "kind" | "subtype" | "epithet" | "aliases" | "gender" | "summary">;
 
@@ -61,6 +62,7 @@ const ENTITIES = new Map<string, Entity>(
       aliases: e.aliases ?? [],
       summary: e.summary ?? null,
       article: articles[e.slug] ?? null,
+      image: e.image ?? null,
     }))
     .sort((a, b) => a.name.localeCompare(b.name))
     .map((e) => [e.slug, e]),

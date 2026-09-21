@@ -1,6 +1,7 @@
 {
   "version": "0.0.1",
   "configurations": [
-    { "name": "mythographia", "runtimeExecutable": "bun", "runtimeArgs": ["run", "dev"], "port": 3000, "autoPort": true }
+    { "name": "mythographia", "runtimeExecutable": "bun", "runtimeArgs": ["run", "dev"], "port": 3000, "autoPort": true },
+    { "name": "mythographia-prod", "runtimeExecutable": "bun", "runtimeArgs": ["run", "start", "--", "-p", "3100"], "port": 3100 }
   ]
 }

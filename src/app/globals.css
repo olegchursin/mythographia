@@ -441,3 +441,12 @@ table.ref tbody tr:hover td { background: color-mix(in srgb, var(--gold) 5%, tra
     animation-delay: 0s !important;
   }
 }
+
+/* Entity illustrations: transparent cut-outs, lifted off the dark ground with a gold rim-light. */
+.infobox-art { filter: drop-shadow(0 0 1px color-mix(in srgb, var(--gold) 70%, transparent)) drop-shadow(0 0 22px color-mix(in srgb, var(--gold) 28%, transparent)); }
+.hero-art {
+  opacity: 0.22;
+  filter: grayscale(1) brightness(1.5) drop-shadow(0 0 1px color-mix(in srgb, var(--gold) 80%, transparent)) drop-shadow(0 0 30px color-mix(in srgb, var(--gold) 35%, transparent));
+  mask-image: linear-gradient(to left, #000 55%, transparent);
+}
+:root[data-theme="light"] .hero-art { opacity: 0.12; filter: grayscale(1); }

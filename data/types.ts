@@ -15,6 +15,8 @@ export interface EntitySeed {
   domains?: string[];
   /** 1–2 sentence lead, reference voice. Required for every entity. */
   summary?: string;
+  /** illustration under public/, e.g. "/images/cerberus.webp" */
+  image?: string;
 }
 
 export interface RelOpts {
@@ -37,6 +39,7 @@ interface Extra {
   aliases?: string[];
   domains?: string[];
   summary?: string;
+  image?: string;
 }
 
 const make =
