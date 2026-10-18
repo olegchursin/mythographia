@@ -3,7 +3,7 @@ import { Reveal } from "./motion/Reveal";
 
 export function SiteFooter({ nav }: { nav: { href: string; label: string }[] }) {
   return (
-    <footer className="relative mt-10 overflow-hidden border-t border-line">
+    <footer className="relative mt-10 overflow-hidden border-t border-line pb-[var(--safe-b)]">
       <div className="meander meander-march mt-[-1px] opacity-70" />
       <div className="mx-auto grid max-w-6xl gap-10 px-5 pb-10 pt-16 md:grid-cols-[minmax(0,1fr)_auto]">
         <Reveal>
@@ -21,7 +21,7 @@ export function SiteFooter({ nav }: { nav: { href: string; label: string }[] }) 
           </ul>
         </Reveal>
       </div>
-      <p aria-hidden className="pointer-events-none select-none whitespace-nowrap text-center font-display text-[13.5vw] font-bold leading-[0.8] tracking-[0.06em] text-ink/[0.045]">
+      <p aria-hidden className="pointer-events-none select-none whitespace-nowrap text-center font-display text-[calc((100vw-var(--safe-l)-var(--safe-r))*0.1)] font-bold leading-[0.8] tracking-[0.06em] text-ink/[0.045]">
         MYTHOGRAPHIA
       </p>
     </footer>

@@ -60,7 +60,7 @@ export default async function FrontPage() {
     <PageTransition className="">
       <section className="relative isolate flex min-h-[100svh] items-center overflow-hidden">
         <HeroConstellation names={constellation} />
-        <HeroFade className="relative mx-auto w-full max-w-5xl px-5 pb-24 pt-36 text-center">
+        <HeroFade className="relative mx-auto w-full max-w-5xl px-5 pb-[calc(8rem+var(--safe-b))] pt-[calc(9rem+var(--safe-t))] text-center">
           <p className="label kicker mb-7 inline-block">An encyclopedia of Greek myth</p>
           <h1 className="display">
             <SplitWords text="The myths of the Greeks, with their sources" gild={["myths", "sources"]} />
@@ -71,11 +71,11 @@ export default async function FrontPage() {
             </p>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
               <Magnetic><Link href="/graph" transitionTypes={["nav-forward"]} className="btn btn-primary">Explore the web of relations <span aria-hidden>→</span></Link></Magnetic>
-              <PaletteButton className="btn btn-ghost">Search the encyclopedia <kbd className="rounded-md border border-line px-1.5 py-0.5 text-[0.68rem] text-muted">⌘K</kbd></PaletteButton>
+              <PaletteButton className="btn btn-ghost">Search the encyclopedia <kbd className="rounded-md border border-line px-1.5 py-0.5 text-[0.68rem] text-muted pointer-coarse:hidden">⌘K</kbd></PaletteButton>
             </div>
           </Reveal>
         </HeroFade>
-        <div className="absolute inset-x-0 bottom-7 flex flex-col items-center gap-2 text-muted" aria-hidden>
+        <div className="absolute inset-x-0 bottom-[calc(1.75rem+var(--safe-b))] flex flex-col items-center gap-2 text-muted" aria-hidden>
           <span className="label">Scroll</span>
           <span className="h-10 w-px animate-pulse bg-gradient-to-b from-gold to-transparent" />
         </div>
