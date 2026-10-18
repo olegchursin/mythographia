@@ -1,6 +1,7 @@
 "use client";
 
-import Link, { useLinkStatus } from "next/link";
+import { useLinkStatus } from "next/link";
+import Link from "./Link";
 
 /** A filter chip that is a real link: URL-driven state, with a pulse while the server round-trip is in flight. */
 export function ChipLink({ href, active, children, className = "", scroll = false, title }: { href: string; active?: boolean; children: React.ReactNode; className?: string; scroll?: boolean; title?: string }) {

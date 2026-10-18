@@ -75,7 +75,7 @@
   --color-wine: var(--wine);
   --font-serif: var(--font-source-serif), Georgia, serif;
   --font-sans: var(--font-geist-sans), system-ui, sans-serif;
-  --font-display: var(--font-cinzel), var(--font-source-serif), serif;
+  --font-display: var(--font-cormorant), var(--font-source-serif), serif;
   --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -159,7 +159,7 @@ p { text-wrap: pretty; }
 .page-narrow { max-width: 52rem; }
 
 .display {
-  font-family: var(--font-cinzel), serif;
+  font-family: var(--font-cormorant), serif;
   font-weight: 700;
   font-size: clamp(2.4rem, 6vw, 4.6rem);
   line-height: 1.02;
@@ -257,7 +257,7 @@ p { text-wrap: pretty; }
 .prose-myth p { margin: 0 0 1.25rem; }
 .prose-myth > p:first-child::first-letter {
   float: left;
-  font-family: var(--font-cinzel), serif;
+  font-family: var(--font-cormorant), serif;
   font-weight: 700;
   font-size: 4.4rem;
   line-height: 0.82;

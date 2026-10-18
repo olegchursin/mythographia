@@ -1,10 +1,10 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
 
-export function Infobox({ title, subtitle, glyph, image, rows }: { title: string; subtitle?: string | null; glyph?: string; image?: string | null; rows: { label: string; value: ReactNode }[] }) {
+export function Infobox({ title, label, subtitle, glyph, image, rows }: { title: string; label: string; subtitle?: string | null; glyph?: string; image?: string | null; rows: { label: string; value: ReactNode }[] }) {
   const shown = rows.filter((r) => r.value !== null && r.value !== undefined && r.value !== false);
   return (
-    <aside className="card text-[0.95rem]" aria-label={`${title}: quick facts`}>
+    <aside className="card text-[0.95rem]" aria-label={label}>
       <div className="relative border-b border-line px-5 py-6 text-center">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_90%_at_50%_0%,color-mix(in_srgb,var(--gold)_16%,transparent),transparent)]" aria-hidden />
         {image ? (

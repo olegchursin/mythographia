@@ -1,3 +1,4 @@
+import type { Overlay } from "./i18n/types";
 import { articles, entities, relationships, relationshipTypes, sources, timelines, traditions, wikiLinks } from "./index";
 
 /** Returns a list of human-readable problems with the seed data. Empty = good. */
@@ -41,6 +42,52 @@ export function validateSeed(): string[] {
 
   const connected = new Set(relationships.flatMap((r) => [r.from, r.to]));
   for (const e of entities) if (!connected.has(e.slug)) problems.push(`orphan entity (no edges): ${e.slug}`);
+
+  return problems;
+}
+
+const sorted = (xs: string[]) => [...xs].sort().join(",");
+const headings = (body: string) => body.split("\n").filter((l) => /^##\s/.test(l)).length;
+
+/** Problems with one locale's translation overlay: missing or orphaned keys, broken or mismatched links. Empty = good. */
+export function validateOverlay(locale: string, o: Overlay): string[] {
+  const problems: string[] = [];
+  const slugs = new Set(entities.map((e) => e.slug));
+  const coverage = (what: string, expected: Iterable<string>, actual: Record<string, unknown>) => {
+    const want = new Set(expected);
+    for (const k of want) if (!(k in actual)) problems.push(`[${locale}] missing ${what}: ${k}`);
+    for (const k of Object.keys(actual)) if (!want.has(k)) problems.push(`[${locale}] unknown ${what}: ${k}`);
+  };
+  const sameLinks = (where: string, en: string, tr: string) => {
+    for (const target of wikiLinks(tr)) if (!slugs.has(target)) problems.push(`[${locale}] unknown entity "${target}" in ${where}`);
+    if (sorted(wikiLinks(en)) !== sorted(wikiLinks(tr))) problems.push(`[${locale}] links differ from English in ${where}`);
+  };
+
+  coverage("entity", slugs, o.entities);
+  for (const e of entities) {
+    const t = o.entities[e.slug];
+    if (!t) continue;
+    if (!t.name.trim() || !t.summary.trim()) problems.push(`[${locale}] empty name or summary: ${e.slug}`);
+    sameLinks(`summary of ${e.slug}`, e.summary ?? "", t.summary);
+  }
+
+  coverage("article", Object.keys(articles), o.articles);
+  for (const [slug, body] of Object.entries(o.articles)) {
+    if (!articles[slug]) continue;
+    sameLinks(`article "${slug}"`, articles[slug], body);
+    if (headings(articles[slug]) !== headings(body)) problems.push(`[${locale}] heading count differs in article "${slug}"`);
+  }
+
+  const relStrings = new Set(relationships.flatMap((r) => [r.cite, r.note]).filter((s): s is string => !!s));
+  coverage("relationship string", relStrings, o.relStrings);
+  for (const s of relStrings) if (o.relStrings[s] !== undefined) sameLinks(`relationship string "${s.slice(0, 40)}"`, s, o.relStrings[s]);
+
+  coverage("relationship type", relationshipTypes.map((t) => t.key), o.relTypes);
+  coverage("tradition", traditions.map((t) => t.key), o.traditions);
+  coverage("source", sources.map((s) => s.slug), o.sources);
+  coverage("timeline", Object.keys(timelines), o.timelines);
+  for (const [slug, steps] of Object.entries(timelines))
+    if (o.timelines[slug] && o.timelines[slug].length !== steps.length) problems.push(`[${locale}] timeline of ${slug} has ${o.timelines[slug].length} steps, English has ${steps.length}`);
 
   return problems;
 }

@@ -1,13 +1,16 @@
 // Mythographia service worker: visited articles stay readable offline.
 // Bump VERSION to drop every cache on the next activation.
-const VERSION = "v1";
+const VERSION = "v2";
 const PAGES = `pages-${VERSION}`;
 const ASSETS = `assets-${VERSION}`;
-const OFFLINE_URL = "/offline";
+const OFFLINE_URLS = { en: "/en/offline", ru: "/ru/offline" };
+const offlineFor = (pathname) => (pathname.startsWith("/ru") ? OFFLINE_URLS.ru : OFFLINE_URLS.en);
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(PAGES).then((cache) => cache.add(new Request(OFFLINE_URL, { cache: "reload" }))).then(() => self.skipWaiting()),
+    caches.open(PAGES)
+      .then((cache) => cache.addAll(Object.values(OFFLINE_URLS).map((u) => new Request(u, { cache: "reload" }))))
+      .then(() => self.skipWaiting()),
   );
 });
 
@@ -54,7 +57,7 @@ self.addEventListener("fetch", (event) => {
   if (url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/icons/") || url.pathname.startsWith("/images/") || url.pathname.startsWith("/_next/image")) {
     event.respondWith(cacheFirst(request));
   } else if (request.mode === "navigate") {
-    event.respondWith(networkFirst(request, OFFLINE_URL));
+    event.respondWith(networkFirst(request, offlineFor(url.pathname)));
   } else if (!url.pathname.startsWith("/_next/")) {
     event.respondWith(networkFirst(request));
   }

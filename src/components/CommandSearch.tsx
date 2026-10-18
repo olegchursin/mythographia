@@ -4,6 +4,9 @@ import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { plural } from "@/i18n/config";
+import type { Dictionary } from "@/i18n/dictionaries/en";
+import { useLocale, useLocalize } from "./Link";
 
 interface Item {
   slug: string;
@@ -15,7 +18,7 @@ interface Item {
 
 const norm = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
-export function searchItems(index: Item[], query: string, limit = 8): Item[] {
+export function searchItems(index: Item[], query: string, limit = 8, locale = "en"): Item[] {
   const q = norm(query.trim());
   if (!q) return [];
   const scored: [number, Item][] = [];
@@ -24,32 +27,34 @@ export function searchItems(index: Item[], query: string, limit = 8): Item[] {
     const score = names.some((n) => n === q) ? 0 : names.some((n) => n.startsWith(q)) ? 1 : names.some((n) => n.includes(q)) ? 2 : norm(item.hint).includes(q) ? 3 : -1;
     if (score >= 0) scored.push([score, item]);
   }
-  return scored.sort((a, b) => a[0] - b[0] || a[1].name.localeCompare(b[1].name)).slice(0, limit).map(([, item]) => item);
+  return scored.sort((a, b) => a[0] - b[0] || a[1].name.localeCompare(b[1].name, locale)).slice(0, limit).map(([, item]) => item);
 }
 
 /** Anything on the page can open the palette: window.dispatchEvent(new Event(OPEN_PALETTE)). */
 export const OPEN_PALETTE = "mythographia:open-palette";
 
 const SHORTCUTS = [
-  { href: "/a-z", name: "Index", hint: "Every entry, A to Z", glyph: "☰" },
-  { href: "/graph", name: "Relations diagram", hint: "Kin, consorts, enemies and allies", glyph: "✳" },
-  { href: "/tree/zeus", name: "Family trees", hint: "Ancestors and descendants", glyph: "⑂" },
-  { href: "/kinship", name: "Kinship finder", hint: "How two figures are related", glyph: "⟷" },
-  { href: "/traditions", name: "Traditions", hint: "Who tells which version", glyph: "❦" },
-  { href: "/sources", name: "Ancient sources", hint: "The texts cited", glyph: "§" },
-];
+  { key: "index", href: "/a-z", glyph: "☰" },
+  { key: "graph", href: "/graph", glyph: "✳" },
+  { key: "tree", href: "/tree/zeus", glyph: "⑂" },
+  { key: "kinship", href: "/kinship", glyph: "⟷" },
+  { key: "traditions", href: "/traditions", glyph: "❦" },
+  { key: "sources", href: "/sources", glyph: "§" },
+] as const;
 
-export function CommandSearch({ index }: { index: Item[] }) {
+export function CommandSearch({ index, t }: { index: Item[]; t: Dictionary["search"] }) {
   const router = useRouter();
+  const locale = useLocale();
+  const localize = useLocalize();
   const input = useRef<HTMLInputElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
-  const results = useMemo(() => searchItems(index, query, 9), [index, query]);
+  const results = useMemo(() => searchItems(index, query, 9, locale), [index, query, locale]);
   const rows = query.trim()
     ? results.map((r) => ({ key: r.slug, href: `/wiki/${r.slug}`, name: r.name, hint: r.hint, glyph: r.glyph ?? "·" }))
-    : SHORTCUTS.map((s) => ({ key: s.href, ...s }));
+    : SHORTCUTS.map((s) => ({ key: s.href, href: s.href, glyph: s.glyph, ...t.shortcuts[s.key] }));
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -85,7 +90,7 @@ export function CommandSearch({ index }: { index: Item[] }) {
 
   const go = (href: string) => {
     close();
-    router.push(href, { transitionTypes: ["nav-forward"] });
+    router.push(localize(href), { transitionTypes: ["nav-forward"] });
   };
 
   return (
@@ -95,11 +100,11 @@ export function CommandSearch({ index }: { index: Item[] }) {
         type="button"
         onClick={() => setOpen(true)}
         aria-haspopup="dialog"
-        aria-label="Search the encyclopedia"
+        aria-label={t.open}
         className="group flex h-10 items-center gap-2.5 rounded-full border border-line bg-glass pl-3.5 pr-2 font-sans text-sm text-muted transition-colors hover:border-gold/50 hover:text-ink"
       >
         <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" aria-hidden><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4.5 4.5" /></svg>
-        <span className="hidden pr-6 sm:inline">Search…</span>
+        <span className="hidden pr-6 sm:inline lg:hidden xl:inline">{t.trigger}</span>
         <kbd className="hidden rounded-md border border-line px-1.5 py-0.5 text-[0.68rem] tracking-wide sm:inline">⌘K</kbd>
       </button>
 
@@ -118,7 +123,7 @@ export function CommandSearch({ index }: { index: Item[] }) {
               <motion.div
                 role="dialog"
                 aria-modal="true"
-                aria-label="Search the encyclopedia"
+                aria-label={t.open}
                 className="relative w-full max-w-xl overflow-hidden rounded-[22px] border border-line bg-[var(--glass-strong)] shadow-[0_40px_120px_-20px_rgb(0_0_0/0.8)] backdrop-blur-2xl"
                 initial={{ opacity: 0, y: -18, scale: 0.96 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -148,16 +153,16 @@ export function CommandSearch({ index }: { index: Item[] }) {
                     aria-controls="palette-list"
                     aria-activedescendant={rows[active] ? `palette-${active}` : undefined}
                     aria-autocomplete="list"
-                    placeholder="Search gods, heroes, monsters, places…"
+                    placeholder={t.placeholder}
                     className="h-16 w-full bg-transparent text-lg outline-none placeholder:text-muted focus-visible:outline-none"
                   />
                   <kbd className="rounded-md border border-line px-1.5 py-0.5 font-sans text-[0.68rem] text-muted pointer-coarse:hidden">esc</kbd>
                   <button type="button" onClick={close} className="hidden shrink-0 py-2 font-sans text-sm text-gold pointer-coarse:inline">Close</button>
                 </div>
 
-                <p className="label px-5 pb-1 pt-4">{query.trim() ? `${results.length} ${results.length === 1 ? "entry" : "entries"}` : "Jump to"}</p>
+                <p className="label px-5 pb-1 pt-4">{query.trim() ? plural(locale, results.length, t.entries) : t.jumpTo}</p>
                 <ul id="palette-list" role="listbox" className="max-h-[38dvh] overflow-y-auto overscroll-contain p-2 sm:max-h-[50vh]">
-                  {rows.length === 0 && <li className="px-4 py-6 text-center text-muted">Nothing in the surviving sources answers to that name.</li>}
+                  {rows.length === 0 && <li className="px-4 py-6 text-center text-muted">{t.empty}</li>}
                   {rows.map((r, i) => (
                     <li key={r.key} id={`palette-${i}`} role="option" aria-selected={i === active}>
                       <button
@@ -178,7 +183,7 @@ export function CommandSearch({ index }: { index: Item[] }) {
                     </li>
                   ))}
                 </ul>
-                <p className="flex gap-4 border-t border-line px-5 py-2.5 font-sans text-[0.7rem] text-muted pointer-coarse:hidden"><span>↑↓ navigate</span><span>↵ open</span><span>esc close</span></p>
+                <p className="flex gap-4 border-t border-line px-5 py-2.5 font-sans text-[0.7rem] text-muted pointer-coarse:hidden"><span>{t.navigate}</span><span>{t.choose}</span><span>{t.close}</span></p>
               </motion.div>
             </motion.div>
           )}
