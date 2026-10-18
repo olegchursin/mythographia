@@ -29,6 +29,12 @@
   --dur-exit: 160ms;
   --dur-enter: 460ms;
   --dur-move: 480ms;
+
+  /* iPhone notch / Dynamic Island / home indicator (viewport-fit=cover); 0 everywhere else */
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
 }
 
 :root[data-theme="light"] {
@@ -76,7 +82,7 @@
 html {
   background: var(--paper);
   scroll-behavior: smooth;
-  scroll-padding-top: 6.5rem;
+  scroll-padding-top: calc(6.5rem + var(--safe-t));
 }
 
 body {
@@ -85,7 +91,26 @@ body {
   font-size: 17.5px;
   line-height: 1.65;
   overflow-x: clip;
+  /* landscape notch: keeps every in-flow container clear; backgrounds stay full-bleed */
+  padding-left: var(--safe-l);
+  padding-right: var(--safe-r);
+  -webkit-tap-highlight-color: transparent;
 }
+
+/* Backdrop for the iOS status bar in the installed app (black-translucent draws the page under it).
+   Zero height in the browser and on desktop. Light theme gets an ink band: iOS forces white status text. */
+.status-veil {
+  position: fixed;
+  inset-inline: 0;
+  top: 0;
+  z-index: 55;
+  height: var(--safe-t);
+  pointer-events: none;
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+:root[data-theme="light"] .status-veil { background: rgb(31 27 22 / 0.92); }
 
 /* atmosphere: slow-drifting glows behind everything, film grain on top of them */
 body::before,
@@ -129,7 +154,7 @@ p { text-wrap: pretty; }
   margin-inline: auto;
   width: 100%;
   max-width: 72rem;
-  padding: 8.5rem 1.25rem 6rem;
+  padding: calc(8.5rem + var(--safe-t)) 1.25rem calc(6rem + var(--safe-b));
 }
 .page-narrow { max-width: 52rem; }
 
@@ -139,8 +164,15 @@ p { text-wrap: pretty; }
   font-size: clamp(2.4rem, 6vw, 4.6rem);
   line-height: 1.02;
   letter-spacing: 0.01em;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 .display-sm { font-size: clamp(2rem, 4.4vw, 3.3rem); }
+/* phones: long names ("The Hecatoncheires", "Metamorphoses") must fit 320–375px screens */
+@media (max-width: 639px) {
+  .display { font-size: clamp(1.85rem, 9vw, 2.4rem); }
+  .display-sm { font-size: clamp(1.7rem, 8vw, 2rem); }
+}
 
 .text-gilded {
   background: linear-gradient(100deg, var(--ink) 0%, var(--gold) 45%, var(--terracotta) 100%);
@@ -169,7 +201,7 @@ p { text-wrap: pretty; }
   background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
   transition: background-size 0.35s var(--ease), color 0.2s;
 }
-.wikilink:hover { background-size: 100% 1px; }
+@media (hover: hover) { .wikilink:hover { background-size: 100% 1px; } }
 
 /* small-caps sans label used for section kickers, table heads, infobox keys */
 .label {
@@ -257,12 +289,15 @@ p { text-wrap: pretty; }
   background: radial-gradient(380px circle at var(--mx, 50%) var(--my, 0%), color-mix(in srgb, var(--accent, var(--gold)) 20%, transparent), transparent 65%);
   pointer-events: none;
 }
-.card-hover:hover {
-  border-color: color-mix(in srgb, var(--accent, var(--gold)) 45%, var(--line));
-  box-shadow: var(--shadow), inset 0 1px 0 rgb(255 255 255 / 0.06);
-  translate: 0 -3px;
+/* hover lifts are pointer-only: on touch a tap would leave the card stuck lifted */
+@media (hover: hover) {
+  .card-hover:hover {
+    border-color: color-mix(in srgb, var(--accent, var(--gold)) 45%, var(--line));
+    box-shadow: var(--shadow), inset 0 1px 0 rgb(255 255 255 / 0.06);
+    translate: 0 -3px;
+  }
 }
-.card-hover:hover::before { opacity: 1; }
+@media (hover: hover) { .card-hover:hover::before { opacity: 1; } }
 
 .stage {
   border-radius: var(--r-card);
@@ -294,9 +329,9 @@ p { text-wrap: pretty; }
   box-shadow: 0 0 0 1px rgb(255 255 255 / 0.15) inset, 0 10px 34px -10px color-mix(in srgb, var(--gold) 70%, transparent);
 }
 :root[data-theme="light"] .btn-primary { color: #fffaf0; background: linear-gradient(120deg, #a8452d, #8f6d10); }
-.btn-primary:hover { box-shadow: 0 0 0 1px rgb(255 255 255 / 0.25) inset, 0 14px 44px -8px color-mix(in srgb, var(--gold) 90%, transparent); }
+@media (hover: hover) { .btn-primary:hover { box-shadow: 0 0 0 1px rgb(255 255 255 / 0.25) inset, 0 14px 44px -8px color-mix(in srgb, var(--gold) 90%, transparent); } }
 .btn-ghost { border: 1px solid var(--line); background: var(--glass); color: var(--ink); }
-.btn-ghost:hover { border-color: color-mix(in srgb, var(--gold) 50%, var(--line)); }
+@media (hover: hover) { .btn-ghost:hover { border-color: color-mix(in srgb, var(--gold) 50%, var(--line)); } }
 
 .chip {
   display: inline-flex;
@@ -312,7 +347,7 @@ p { text-wrap: pretty; }
   white-space: nowrap;
   transition: color 0.25s, border-color 0.25s, background 0.25s, translate 0.3s var(--ease);
 }
-.chip:hover { color: var(--ink); border-color: color-mix(in srgb, var(--gold) 45%, var(--line)); translate: 0 -1px; }
+@media (hover: hover) { .chip:hover { color: var(--ink); border-color: color-mix(in srgb, var(--gold) 45%, var(--line)); translate: 0 -1px; } }
 .chip[data-active="true"] {
   color: var(--ink);
   border-color: color-mix(in srgb, var(--accent, var(--gold)) 60%, transparent);
@@ -370,7 +405,7 @@ table.ref td {
   transition: background 0.25s;
 }
 table.ref tr:last-child td { border-bottom: 0; }
-table.ref tbody tr:hover td { background: color-mix(in srgb, var(--gold) 5%, transparent); }
+@media (hover: hover) { table.ref tbody tr:hover td { background: color-mix(in srgb, var(--gold) 5%, transparent); } }
 
 /* category colours, shared by graph edges, legends and chain connectors */
 .cat-family { --cat: var(--olive); --accent: var(--olive); }
@@ -407,7 +442,7 @@ table.ref tbody tr:hover td { background: color-mix(in srgb, var(--gold) 5%, tra
 }
 @keyframes pop { from { opacity: 0; translate: 0 8px; } to { opacity: 1; translate: 0 0; } }
 .tree-node rect { transition: stroke 0.25s, fill 0.25s, filter 0.3s; }
-.tree-node:hover rect { stroke: var(--gold); filter: drop-shadow(0 0 10px color-mix(in srgb, var(--gold) 55%, transparent)); }
+@media (hover: hover) { .tree-node:hover rect { stroke: var(--gold); filter: drop-shadow(0 0 10px color-mix(in srgb, var(--gold) 55%, transparent)); } }
 
 /* ---------- view transitions ---------- */
 

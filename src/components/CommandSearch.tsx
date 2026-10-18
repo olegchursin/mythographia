@@ -113,7 +113,7 @@ export function CommandSearch({ index, t }: { index: Item[]; t: Dictionary["sear
           {open && (
             <motion.div
               key="palette"
-              className="fixed inset-0 z-[80] flex items-start justify-center px-4 pt-[14vh]"
+              className="fixed inset-0 z-[80] flex items-start justify-center pl-[calc(var(--safe-l)+1rem)] pr-[calc(var(--safe-r)+1rem)] pt-[calc(var(--safe-t)+0.75rem)] sm:pt-[14vh]"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -156,11 +156,12 @@ export function CommandSearch({ index, t }: { index: Item[]; t: Dictionary["sear
                     placeholder={t.placeholder}
                     className="h-16 w-full bg-transparent text-lg outline-none placeholder:text-muted focus-visible:outline-none"
                   />
-                  <kbd className="rounded-md border border-line px-1.5 py-0.5 font-sans text-[0.68rem] text-muted">esc</kbd>
+                  <kbd className="rounded-md border border-line px-1.5 py-0.5 font-sans text-[0.68rem] text-muted pointer-coarse:hidden">esc</kbd>
+                  <button type="button" onClick={close} className="hidden shrink-0 py-2 font-sans text-sm text-gold pointer-coarse:inline">Close</button>
                 </div>
 
                 <p className="label px-5 pb-1 pt-4">{query.trim() ? plural(locale, results.length, t.entries) : t.jumpTo}</p>
-                <ul id="palette-list" role="listbox" className="max-h-[50vh] overflow-y-auto p-2">
+                <ul id="palette-list" role="listbox" className="max-h-[38dvh] overflow-y-auto overscroll-contain p-2 sm:max-h-[50vh]">
                   {rows.length === 0 && <li className="px-4 py-6 text-center text-muted">{t.empty}</li>}
                   {rows.map((r, i) => (
                     <li key={r.key} id={`palette-${i}`} role="option" aria-selected={i === active}>
@@ -182,7 +183,7 @@ export function CommandSearch({ index, t }: { index: Item[]; t: Dictionary["sear
                     </li>
                   ))}
                 </ul>
-                <p className="flex gap-4 border-t border-line px-5 py-2.5 font-sans text-[0.7rem] text-muted"><span>{t.navigate}</span><span>{t.choose}</span><span>{t.close}</span></p>
+                <p className="flex gap-4 border-t border-line px-5 py-2.5 font-sans text-[0.7rem] text-muted pointer-coarse:hidden"><span>{t.navigate}</span><span>{t.choose}</span><span>{t.close}</span></p>
               </motion.div>
             </motion.div>
           )}
