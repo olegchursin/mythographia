@@ -1,6 +1,7 @@
-import Link from "next/link";
+import Link from "@/components/Link";
 import { CenterScroll } from "./CenterScroll";
 import type { FamilyTree as Tree } from "@/lib/graph";
+import { getI18n } from "@/i18n/server";
 import type { EntityLite } from "@/lib/queries";
 
 const W = 132;
@@ -9,10 +10,9 @@ const GAP = 14;
 const ROW = 104;
 const PAD = 16;
 
-const GEN_LABEL: Record<string, string> = { "-3": "Great-grandparents", "-2": "Grandparents", "-1": "Parents", "1": "Children", "2": "Grandchildren" };
-
 /** Static SVG genealogy: generations as rows, the subject highlighted, every box a link that re-roots the tree. */
-export function FamilyTree({ tree, entities, hrefFor }: { tree: Tree; entities: Map<string, EntityLite>; hrefFor: (slug: string) => string }) {
+export async function FamilyTree({ tree, entities, hrefFor }: { tree: Tree; entities: Map<string, EntityLite>; hrefFor: (slug: string) => string }) {
+  const { t } = await getI18n();
   const gens = [...new Set(tree.nodes.map((n) => n.gen))].sort((a, b) => a - b);
   const widest = Math.max(...gens.map((g) => tree.nodes.filter((n) => n.gen === g).length));
   const width = widest * (W + GAP) - GAP + PAD * 2 + 150;
@@ -29,11 +29,11 @@ export function FamilyTree({ tree, entities, hrefFor }: { tree: Tree; entities: 
 
   return (
     <CenterScroll className="stage overflow-x-auto p-3">
-      <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Family tree" className="mx-auto block font-sans">
+      <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label={t.tree.title} className="mx-auto block font-sans">
         {gens.map((g) => (
           <text key={g} x={PAD} y={PAD + (g - minGen) * ROW + H / 2 + 4} fontSize={11} fill="var(--muted)" style={{ textTransform: "uppercase", letterSpacing: "0.08em" }}>
-            {g === 0 ? "" : (GEN_LABEL[String(g)] ?? `Generation ${g > 0 ? "+" : ""}${g}`)}
-            {tree.hidden[g] ? ` (+${tree.hidden[g]} more)` : ""}
+            {g === 0 ? "" : (t.tree.generations[String(g)] ?? t.tree.generation(g))}
+            {tree.hidden[g] ? t.tree.more(tree.hidden[g]) : ""}
           </text>
         ))}
 

@@ -1,5 +1,7 @@
 import type { PathStep } from "@/lib/graph";
+import { getI18n } from "@/i18n/server";
 import type { EntityLite, Tradition } from "@/lib/queries";
+import { RichText } from "./ArticleBody";
 import { EntityLink } from "./Entity";
 import { Stagger, StaggerItem } from "./motion/Reveal";
 
@@ -11,7 +13,8 @@ interface Props {
 }
 
 /** A vertical chain: Zeus — parent of → Aeacus — parent of → Peleus … with the citation for every link. */
-export function PathChain({ start, steps, entities, traditions }: Props) {
+export async function PathChain({ start, steps, entities, traditions }: Props) {
+  const { t: dict } = await getI18n();
   return (
     <Stagger as="ol">
       <StaggerItem as="li"><Name slug={start} entities={entities} /></StaggerItem>
@@ -22,9 +25,9 @@ export function PathChain({ start, steps, entities, traditions }: Props) {
             <div className="relative my-1 ml-[1.35rem] border-l border-dashed border-(--cat) py-3 pl-7 text-[0.95rem]">
               <span className="absolute -left-[4.5px] top-1/2 size-2 -translate-y-1/2 rounded-full bg-(--cat) shadow-[0_0_12px_var(--cat)]" aria-hidden />
               <span className="italic text-(--cat)">{s.label}</span>
-              {s.edge.certainty !== "canonical" && <span className="ml-2 font-sans text-xs text-gold">({s.edge.certainty})</span>}
+              {s.edge.certainty !== "canonical" && <span className="ml-2 font-sans text-xs text-gold">({dict.certainty[s.edge.certainty]})</span>}
               {(s.edge.citation || t) && <span className="ml-2 font-sans text-xs text-muted">{[s.edge.citation, t?.name].filter(Boolean).join(" · ")}</span>}
-              {s.edge.notes && <span className="block text-sm text-muted">{s.edge.notes}</span>}
+              {s.edge.notes && <span className="block text-sm text-muted"><RichText text={s.edge.notes} entities={entities} /></span>}
             </div>
             <Name slug={s.to} entities={entities} />
           </StaggerItem>

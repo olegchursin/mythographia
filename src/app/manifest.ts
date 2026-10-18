@@ -19,9 +19,9 @@ export default function manifest(): MetadataRoute.Manifest {
       { src: "/icons/icon.svg", sizes: "any", type: "image/svg+xml" },
     ],
     shortcuts: [
-      { name: "Index", url: "/a-z" },
-      { name: "Relations", url: "/graph" },
-      { name: "Kinship", url: "/kinship" },
+      { name: "Index · Указатель", url: "/a-z" },
+      { name: "Relations · Связи", url: "/graph" },
+      { name: "Kinship · Родство", url: "/kinship" },
     ],
   };
 }

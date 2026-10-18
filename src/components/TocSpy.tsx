@@ -4,7 +4,7 @@ import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 
 /** Contents list that tracks the section currently being read. */
-export function TocSpy({ items }: { items: { id: string; text: string }[] }) {
+export function TocSpy({ items, label }: { items: { id: string; text: string }[]; label: string }) {
   const [active, setActive] = useState(items[0]?.id);
 
   useEffect(() => {
@@ -21,8 +21,8 @@ export function TocSpy({ items }: { items: { id: string; text: string }[] }) {
   }, [items]);
 
   return (
-    <nav aria-label="Contents">
-      <p className="label mb-3">Contents</p>
+    <nav aria-label={label}>
+      <p className="label mb-3">{label}</p>
       <ol className="border-l border-line font-sans text-sm">
         {items.map((t) => (
           <li key={t.id} className="relative">

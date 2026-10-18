@@ -4,7 +4,8 @@ export type Inline = { type: "text"; text: string } | { type: "em"; children: In
 
 export type Block = { type: "heading"; id: string; text: string } | { type: "paragraph"; inlines: Inline[] };
 
-export const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+// Unicode-aware so Cyrillic headings get usable anchors too.
+export const slugify = (s: string) => s.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "");
 
 export function parseInline(text: string): Inline[] {
   const out: Inline[] = [];
@@ -32,8 +33,10 @@ export function parseArticle(body: string): Block[] {
     });
 }
 
-const inlineText = (nodes: Inline[]): string =>
-  nodes.map((i) => (i.type === "link" ? (i.label ?? i.slug.replace(/-/g, " ")) : i.type === "em" ? inlineText(i.children) : i.text)).join("");
+type NameOf = (slug: string) => string | undefined;
+
+const inlineText = (nodes: Inline[], nameOf?: NameOf): string =>
+  nodes.map((i) => (i.type === "link" ? (i.label ?? nameOf?.(i.slug) ?? i.slug.replace(/-/g, " ")) : i.type === "em" ? inlineText(i.children, nameOf) : i.text)).join("");
 
 /** Plain text of a summary/article fragment, for meta descriptions and previews. */
-export const plainText = (text: string) => inlineText(parseInline(text));
+export const plainText = (text: string, nameOf?: NameOf) => inlineText(parseInline(text), nameOf);

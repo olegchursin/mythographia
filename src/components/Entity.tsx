@@ -1,4 +1,5 @@
-import Link from "next/link";
+import Link from "@/components/Link";
+import { getI18n } from "@/i18n/server";
 import type { EntityLite } from "@/lib/queries";
 
 /** Every name in the encyclopedia is a link. Unknown slugs degrade to plain text. */
@@ -12,7 +13,8 @@ export function EntityLink({ entity, slug, children, className = "" }: { entity?
 }
 
 /** Comma-separated run of entity links, for infoboxes and tables. */
-export function EntityList({ slugs, entities, limit }: { slugs: string[]; entities: Map<string, EntityLite>; limit?: number }) {
+export async function EntityList({ slugs, entities, limit }: { slugs: string[]; entities: Map<string, EntityLite>; limit?: number }) {
+  const { t } = await getI18n();
   const shown = limit ? slugs.slice(0, limit) : slugs;
   return (
     <>
@@ -22,7 +24,7 @@ export function EntityList({ slugs, entities, limit }: { slugs: string[]; entiti
           <EntityLink entity={entities.get(s)} slug={s} />
         </span>
       ))}
-      {limit && slugs.length > limit && <span className="text-muted"> and {slugs.length - limit} more</span>}
+      {limit && slugs.length > limit && <span className="text-muted">{t.entity.more(slugs.length - limit)}</span>}
     </>
   );
 }

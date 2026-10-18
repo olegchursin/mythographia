@@ -20,7 +20,7 @@ export interface RoleGroup {
 }
 
 /** Collapse an entity's edges into "killed: A, B · killed by: C" groups, merging duplicate attestations. */
-export function groupConnections(connections: Connection[], entities: Entities): RoleGroup[] {
+export function groupConnections(connections: Connection[], entities: Entities, locale = "en"): RoleGroup[] {
   const groups = new Map<string, RoleGroup>();
   for (const c of connections) {
     const g = groups.get(c.role) ?? { role: c.role, label: c.label, emoji: c.emoji, category: c.category, items: [] };
@@ -32,7 +32,7 @@ export function groupConnections(connections: Connection[], entities: Entities):
       existing.note ??= c.edge.notes;
     } else g.items.push({ other: c.other, edges: [c.edge], contested: c.edge.certainty !== "canonical", note: c.edge.notes });
   }
-  for (const g of groups.values()) g.items.sort((a, b) => (entities.get(a.other)?.name ?? a.other).localeCompare(entities.get(b.other)?.name ?? b.other));
+  for (const g of groups.values()) g.items.sort((a, b) => (entities.get(a.other)?.name ?? a.other).localeCompare(entities.get(b.other)?.name ?? b.other, locale));
   return [...groups.values()];
 }
 
@@ -90,11 +90,10 @@ export function infoboxFacts(slug: string, connections: Connection[], edges: Edg
   };
 }
 
-/** "Killed by X" — or by X or Y, where accounts differ. */
-export function causeOfDeath(connections: Connection[], entities: Entities): string | null {
+/** "Killed by X" — or by X or Y, where accounts differ. `phrase` comes from the dictionary. */
+export function causeOfDeath(connections: Connection[], entities: Entities, phrase: (killers: string[]) => string): string | null {
   const killers = [...new Set(connections.filter((c) => c.role === "killed:in").map((c) => entities.get(c.other)?.name ?? c.other))];
-  if (!killers.length) return null;
-  return killers.length === 1 ? `Killed by ${killers[0]}` : `Killed by ${killers.join(" or ")} (accounts differ)`;
+  return killers.length ? phrase(killers) : null;
 }
 
 export { connectionsOf };

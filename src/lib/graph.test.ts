@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { relationships, relationshipTypes } from "../../data";
-import { validateSeed } from "../../data/validate";
-import { parseArticle, parseInline, plainText } from "./article";
+import { overlays } from "../../data/i18n";
+import { validateOverlay, validateSeed } from "../../data/validate";
+import { parseArticle, parseInline, plainText, slugify } from "./article";
 import { connectionsOf, egoLayout, familyTree, kinshipTerm, kinships, lineage, shortestPath, siblingsOf, type Edge, type RelTypes } from "./graph";
 
 const edges: Edge[] = relationships.map((r, i) => ({
@@ -71,6 +72,16 @@ describe("graph", () => {
     expect(kinshipTerm(2, 3)).toBe("first cousins once removed");
   });
 
+  it("names kinship in Russian", () => {
+    expect(kinshipTerm(0, 1, "ru")).toBe("родитель / предок");
+    expect(kinshipTerm(3, 0, "ru")).toBe("правнук или правнучка / потомок");
+    expect(kinshipTerm(1, 1, "ru")).toMatch(/братья или сёстры/);
+    expect(kinshipTerm(1, 2, "ru")).toBe("дядя или тётя и племянник или племянница");
+    expect(kinshipTerm(2, 2, "ru")).toBe("двоюродные братья или сёстры");
+    expect(kinshipTerm(3, 3, "ru")).toBe("троюродные братья или сёстры");
+    expect(kinshipTerm(2, 3, "ru")).toBe("двоюродные братья или сёстры (с разницей в 1 поколение)");
+  });
+
   it("lays out crowded ego graphs without overlap", () => {
     const slugs = Array.from({ length: 120 }, (_, i) => `n${i}`);
     const placed = egoLayout([{ category: "family", slugs: slugs.slice(0, 90) }, { category: "conflict", slugs: slugs.slice(90) }]);
@@ -113,7 +124,17 @@ describe("family tree", () => {
   });
 });
 
+describe("translations", () => {
+  it("cover every entry, article, relationship string and timeline", () => {
+    for (const [locale, o] of Object.entries(overlays)) expect(o ? validateOverlay(locale, o) : []).toEqual([]);
+  });
+});
+
 describe("article dialect", () => {
+  it("gives Cyrillic headings anchors", () => {
+    expect(slugify("Культ и иконография")).toBe("культ-и-иконография");
+  });
+
   it("parses headings, links and emphasis", () => {
     const blocks = parseArticle("Son of [[zeus]] in the *Iliad*.\n\n## At Troy\n\nHe fought [[hector|the Trojan prince]].");
     expect(blocks.map((b) => b.type)).toEqual(["paragraph", "heading", "paragraph"]);

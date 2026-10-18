@@ -8,7 +8,7 @@ const subscribe = (cb: () => void) => {
   return () => mo.disconnect();
 };
 
-export function ThemeToggle() {
+export function ThemeToggle({ t }: { t: { toDark: string; toLight: string } }) {
   const light = useSyncExternalStore(subscribe, () => document.documentElement.dataset.theme === "light", () => false);
 
   const toggle = () => {
@@ -27,7 +27,7 @@ export function ThemeToggle() {
   };
 
   return (
-    <button type="button" onClick={toggle} aria-label={light ? "Switch to dark theme" : "Switch to light theme"} className="grid size-10 place-items-center rounded-full border border-line bg-glass text-muted transition-colors hover:border-gold/50 hover:text-gold">
+    <button type="button" onClick={toggle} aria-label={light ? t.toDark : t.toLight} className="grid size-10 place-items-center rounded-full border border-line bg-glass text-muted transition-colors hover:border-gold/50 hover:text-gold">
       <svg viewBox="0 0 24 24" className="size-[18px]" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" aria-hidden>
         {light ? (
           <path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" />

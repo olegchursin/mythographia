@@ -211,8 +211,9 @@ export function lineage(ancestor: string, descendant: string, edges: Edge[], typ
   return steps;
 }
 
-/** "father", "great-grandmother", "half-sibling / sibling", "first cousin once removed"… */
-export function kinshipTerm(depthA: number, depthB: number): string {
+/** "grandparent / ancestor", "siblings", "first cousins once removed"… in English or Russian. */
+export function kinshipTerm(depthA: number, depthB: number, locale: "en" | "ru" = "en"): string {
+  if (locale === "ru") return kinshipTermRu(depthA, depthB);
   const greats = (n: number, base: string) => (n <= 1 ? base : n === 2 ? `grand${base}` : `${"great-".repeat(n - 2)}grand${base}`);
   if (depthA === 0 && depthB === 0) return "the same person";
   if (depthA === 0) return greats(depthB, "parent") + " / ancestor";
@@ -226,6 +227,31 @@ export function kinshipTerm(depthA: number, depthB: number): string {
   const removed = Math.abs(depthA - depthB);
   const ord = ["", "first", "second", "third", "fourth", "fifth", "sixth"][degree] ?? `${degree}th`;
   return `${ord} cousins${removed ? ` ${removed === 1 ? "once" : removed === 2 ? "twice" : `${removed}×`} removed` : ""}`;
+}
+
+const RU_COUSINS = ["", "двоюродные", "троюродные", "четвероюродные", "пятиюродные", "шестиюродные", "семиюродные"];
+const ruGenerations = (n: number) => {
+  const rule = new Intl.PluralRules("ru").select(n);
+  return `${n} ${rule === "one" ? "поколение" : rule === "few" ? "поколения" : "поколений"}`;
+};
+
+/** Russian kinship terms. Gender-neutral pairs, like the English, since either figure may be male or female. */
+function kinshipTermRu(depthA: number, depthB: number): string {
+  const pra = (n: number) => "пра".repeat(Math.max(0, n - 2));
+  const up = (n: number) => (n <= 1 ? "родитель" : `${pra(n)}дед или ${pra(n)}бабка`);
+  const down = (n: number) => (n <= 1 ? "ребёнок" : `${pra(n)}внук или ${pra(n)}внучка`);
+  if (depthA === 0 && depthB === 0) return "одно и то же лицо";
+  if (depthA === 0) return `${up(depthB)} / предок`;
+  if (depthB === 0) return `${down(depthA)} / потомок`;
+  if (depthA === 1 && depthB === 1) return "братья или сёстры (хотя бы по одному из родителей)";
+  if (depthA === 1 || depthB === 1) {
+    const n = Math.max(depthA, depthB) - 1;
+    return n === 1 ? "дядя или тётя и племянник или племянница" : `двоюродные ${pra(n)}дед или ${pra(n)}бабка и ${pra(n)}внучатые племянник или племянница`;
+  }
+  const degree = Math.min(depthA, depthB) - 1;
+  const removed = Math.abs(depthA - depthB);
+  const ord = RU_COUSINS[degree] ?? `${degree + 1}-юродные`;
+  return `${ord} братья или сёстры${removed ? ` (с разницей в ${ruGenerations(removed)})` : ""}`;
 }
 
 export interface Placed {
