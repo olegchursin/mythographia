@@ -3,7 +3,10 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import type { Dictionary } from "@/i18n/dictionaries/en";
+import { format } from "@/i18n/fill";
 import type { Category } from "@/lib/graph";
+import { useLocalize } from "./Link";
 
 export interface GraphNode {
   slug: string;
@@ -27,8 +30,9 @@ const COLOR: Record<GraphNode["category"], string> = {
   association: "var(--gold)",
 };
 
-export function EgoGraph({ nodes, focusName, hrefFor }: { nodes: GraphNode[]; focusName: string; hrefFor: Record<string, string> }) {
+export function EgoGraph({ nodes, focusName, hrefFor, t }: { nodes: GraphNode[]; focusName: string; hrefFor: Record<string, string>; t: Dictionary["ego"] }) {
   const router = useRouter();
+  const localize = useLocalize();
   const [hover, setHover] = useState<string | null>(null);
   const extent = Math.max(0.6, ...nodes.map((n) => Math.hypot(n.x, n.y))) + 0.18;
   const size = extent * U;
@@ -36,11 +40,11 @@ export function EgoGraph({ nodes, focusName, hrefFor }: { nodes: GraphNode[]; fo
   const hovered = nodes.find((n) => n.slug === hover);
   const spring = { type: "spring", stiffness: 70, damping: 16 } as const;
   // Re-centring stays on /graph; only the focus node leaves for its article.
-  const go = (slug: string) => router.push(hrefFor[slug], hrefFor[slug].startsWith("/wiki") ? { transitionTypes: ["nav-forward"] } : { scroll: false });
+  const go = (slug: string) => router.push(localize(hrefFor[slug]), hrefFor[slug].startsWith("/wiki") ? { transitionTypes: ["nav-forward"] } : { scroll: false });
 
   return (
     <div className="relative">
-      <svg viewBox={`${-size} ${-size} ${size * 2} ${size * 2}`} className="mx-auto block aspect-square w-full max-w-[760px] select-none" role="img" aria-label={`Relations of ${focusName}`}>
+      <svg viewBox={`${-size} ${-size} ${size * 2} ${size * 2}`} className="mx-auto block aspect-square w-full max-w-[760px] select-none" role="img" aria-label={format(t.relationsOf, { name: focusName })}>
         <defs>
           <filter id="ego-glow" x="-150%" y="-150%" width="400%" height="400%">
             <feGaussianBlur stdDeviation="9" result="b" />
@@ -98,7 +102,7 @@ export function EgoGraph({ nodes, focusName, hrefFor }: { nodes: GraphNode[]; fo
                 style={{ cursor: "pointer", outline: "none" }}
                 tabIndex={0}
                 role="link"
-                aria-label={isFocus ? `${n.name}: open entry` : `${n.name}: ${n.label}`}
+                aria-label={isFocus ? format(t.openEntry, { name: n.name }) : `${n.name}: ${n.label}`}
               >
                 <circle r={r * 2.2} fill="transparent" />
                 <circle r={r} fill={isFocus ? "var(--paper)" : COLOR[n.category]} stroke={isFocus ? "var(--gold)" : "var(--paper)"} strokeWidth={isFocus ? 7 : 3} filter={isFocus || hover === n.slug ? "url(#ego-glow)" : undefined} />
@@ -126,10 +130,10 @@ export function EgoGraph({ nodes, focusName, hrefFor }: { nodes: GraphNode[]; fo
         {hovered && hovered.category !== "focus" ? (
           <>
             {focusName} — <span style={{ color: COLOR[hovered.category] }} className="font-semibold">{hovered.label}</span> — {hovered.name}
-            {hovered.contested && <span className="ml-1 font-sans text-xs text-muted">(disputed)</span>}
+            {hovered.contested && <span className="ml-1 font-sans text-xs text-muted">{t.disputed}</span>}
           </>
         ) : (
-          <span className="font-sans text-sm text-muted">Point at a name to see the relation; select it to re-centre the diagram.</span>
+          <span className="font-sans text-sm text-muted">{t.hint}</span>
         )}
       </p>
     </div>
