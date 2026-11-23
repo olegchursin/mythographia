@@ -17,20 +17,20 @@ export default async function SourcesPage() {
   return (
     <PageTransition className="page max-w-[60rem]">
       <p className="label kicker">{t.sources.kicker}</p>
-      <h1 className="display mt-4">{t.sources.titleStart}<span className="text-gilded">{t.sources.titleGild}</span></h1>
-      <p className="lede mt-4">{t.sources.lede}</p>
-      <Reveal className="table-wrap mt-12" y={40}><table className="ref">
+      <h1 className="display mt-2">{t.sources.titleStart}{t.sources.titleGild}</h1>
+      <p className="lede mt-3">{t.sources.lede}</p>
+      <Reveal className="table-wrap mt-10"><table className="ref">
         <thead><tr><th className="label">{t.sources.author}</th><th className="label">{t.sources.work}</th><th className="label">{t.sources.date}</th><th className="label text-right">{t.sources.citations}</th></tr></thead>
         <tbody>
           {Object.values(sources).sort((a, b) => count(b.slug) - count(a.slug)).map((s) => (
             <tr key={s.slug}>
               <td className="whitespace-nowrap">{s.author}</td>
               <td>
-                <Link href={`/sources/${s.slug}`} className="wikilink italic">{s.work}</Link>
+                <Link href={`/sources/${s.slug}`} className="wikilink font-serif italic">{s.work}</Link>
                 {s.summary && <div className="text-sm text-muted">{s.summary}</div>}
               </td>
               <td className="whitespace-nowrap text-sm">{s.period}</td>
-              <td className="text-right font-sans text-sm text-gold">{count(s.slug)}</td>
+              <td className="text-right font-sans text-sm font-medium tabular-nums">{count(s.slug)}</td>
             </tr>
           ))}
         </tbody>

@@ -26,7 +26,7 @@ export async function ClaimsTable({ edges, entities, types }: Props) {
               <td>
                 <EntityLink entity={entities.get(e.source)} slug={e.source} /> <span className="italic text-muted">{types[e.type]?.label}</span>{" "}
                 <EntityList slugs={[...new Set(group.map((g) => g.target))]} entities={entities} />
-                {e.certainty !== "canonical" && <span className="ml-1.5 font-sans text-xs text-gold">({t.certainty[e.certainty]})</span>}
+                {e.certainty !== "canonical" && <span className="ml-1.5 font-sans text-xs text-brand">({t.certainty[e.certainty]})</span>}
                 {e.notes && <div className="text-sm text-muted"><RichText text={e.notes} entities={entities} /></div>}
               </td>
               <td className="text-sm">{e.citation ?? <span className="text-muted">—</span>}</td>

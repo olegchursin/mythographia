@@ -31,37 +31,38 @@ export default async function IndexPage({ searchParams }: PageProps<"/[lang]/a-z
 
   return (
     <PageTransition>
-      <p className="label kicker">{t.aToZ.kicker}</p>
-      <h1 className="display mt-4">{t.aToZ.title}</h1>
-      <p className="lede mt-3">{t.aToZ.count(shown.length)}{subtype ? t.aToZ.ofType(t.subtype[subtype] ?? subtype) : ""}.</p>
+      <header>
+        <h1 className="display">{t.aToZ.title}</h1>
+        <p className="lede mt-2">{t.aToZ.count(shown.length)}{subtype ? t.aToZ.ofType(t.subtype[subtype] ?? subtype) : ""}.</p>
+      </header>
 
-      <nav className="mt-9 flex flex-wrap gap-2" aria-label={t.aToZ.filterKind}>
-        {KINDS.map((k) => <ChipLink key={k} href={k === "all" ? "/a-z" : `/a-z?kind=${k}`} active={k === kind}>{t.aToZ.kinds[k]}</ChipLink>)}
-      </nav>
-      {kind !== "all" && subtypes.length > 1 && (
-        <nav className="mt-3 flex flex-wrap gap-2 border-t border-line pt-3" aria-label={t.aToZ.filterType}>
-          <ChipLink href={`/a-z?kind=${kind}`} active={!subtype}>{t.aToZ.all}</ChipLink>
-          {subtypes.map(([s, list]) => (
-            <ChipLink key={s} href={`/a-z?kind=${kind}&subtype=${encodeURIComponent(s)}`} active={subtype === s} className="capitalize">
-              {t.subtype[s] ?? s} <span className="text-xs opacity-60">{list.length}</span>
-            </ChipLink>
-          ))}
+      {/* Magnific-style filter bar: sticks under the top bar */}
+      <div className="sticky top-[calc(3.5rem+1px+var(--safe-t))] z-30 -mx-5 mt-6 space-y-2 border-b border-line bg-[color-mix(in_srgb,var(--paper)_92%,transparent)] px-5 py-3 backdrop-blur-xl sm:-mx-8 sm:px-8">
+        <nav className="-mx-5 flex gap-1.5 overflow-x-auto px-5 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:px-0" aria-label={t.aToZ.filterKind}>
+          {KINDS.map((k) => <ChipLink key={k} href={k === "all" ? "/a-z" : `/a-z?kind=${k}`} active={k === kind}>{t.aToZ.kinds[k]}</ChipLink>)}
         </nav>
-      )}
-
-      <SwapTransition key={`${kind}:${subtype}`} className="mt-10 grid gap-8 lg:grid-cols-[3rem_minmax(0,1fr)]">
-        <nav className="flex gap-1 overflow-x-auto font-display text-base lg:sticky lg:top-28 lg:max-h-[calc(100svh-9rem)] lg:flex-col lg:self-start lg:overflow-y-auto" aria-label={t.aToZ.jump}>
-          {letters.map(([l]) => <a key={l} href={`#${l}`} className="grid size-8 shrink-0 place-items-center rounded-lg text-muted transition-colors hover:bg-gold/10 hover:text-gold">{l}</a>)}
+        {kind !== "all" && subtypes.length > 1 && (
+          <nav className="-mx-5 flex gap-1.5 overflow-x-auto px-5 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:px-0" aria-label={t.aToZ.filterType}>
+            <ChipLink href={`/a-z?kind=${kind}`} active={!subtype}>{t.aToZ.all}</ChipLink>
+            {subtypes.map(([s, list]) => (
+              <ChipLink key={s} href={`/a-z?kind=${kind}&subtype=${encodeURIComponent(s)}`} active={subtype === s} className="capitalize">
+                {t.subtype[s] ?? s} <span className="text-xs opacity-60">{list.length}</span>
+              </ChipLink>
+            ))}
+          </nav>
+        )}
+        <nav className="-mx-5 flex gap-0.5 overflow-x-auto px-5 font-serif text-[0.95rem] [scrollbar-width:none] sm:mx-0 sm:px-0" aria-label={t.aToZ.jump}>
+          {letters.map(([l]) => <a key={l} href={`#${l}`} className="grid size-8 shrink-0 place-items-center rounded-lg text-muted transition-colors hover:bg-hover hover:text-ink">{l}</a>)}
         </nav>
+      </div>
 
-        <div className="space-y-14">
-          {letters.map(([letter, list]) => (
-            <Reveal as="section" key={letter} className="grid gap-x-8 sm:grid-cols-[5rem_minmax(0,1fr)]">
-              <h2 id={letter} className="font-display text-6xl font-bold leading-none text-gilded sm:sticky sm:top-28 sm:self-start">{letter}</h2>
-              <ul className="mt-4 gap-10 border-t border-line pt-4 sm:mt-0 md:columns-2">{list.map((e) => <EntityEntry key={e.slug} entity={e} />)}</ul>
-            </Reveal>
-          ))}
-        </div>
+      <SwapTransition key={`${kind}:${subtype}`} className="mt-8 space-y-10">
+        {letters.map(([letter, list]) => (
+          <Reveal as="section" key={letter}>
+            <h2 id={letter} className="mb-2 scroll-mt-[calc(var(--safe-t)+11rem)] font-serif text-3xl font-semibold">{letter}</h2>
+            <ul className="grid gap-x-3 gap-y-0.5 sm:grid-cols-2 lg:grid-cols-3">{list.map((e) => <EntityEntry key={e.slug} entity={e} />)}</ul>
+          </Reveal>
+        ))}
       </SwapTransition>
     </PageTransition>
   );

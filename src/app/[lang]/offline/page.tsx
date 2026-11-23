@@ -11,14 +11,15 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
 export default async function Offline() {
   const { t } = await getI18n();
   return (
-    <PageTransition className="page grid min-h-[80svh] place-items-center text-center">
-      <div>
-        <div className="meander meander-march mx-auto my-6 max-w-sm" />
-        <h1 className="display display-sm">{t.offline.title}</h1>
-        <p className="lede mx-auto mt-4">{t.offline.lede}</p>
-        <div className="mt-9 flex flex-wrap justify-center gap-3">
-          <Link href="/" className="btn btn-primary">{t.offline.home}</Link>
+    <PageTransition className="page grid min-h-[70svh] place-items-center text-center">
+      <div className="max-w-md">
+        <span className="glyph-tile mx-auto size-14 rounded-full text-2xl" aria-hidden>⛵</span>
+        <h1 className="mt-5 font-serif text-2xl font-semibold">{t.offline.title}</h1>
+        <p className="mt-2 text-muted">{t.offline.lede}</p>
+        <div className="mt-6 flex justify-center">
+          <Link href="/" className="btn btn-ink">{t.offline.home}</Link>
         </div>
+        <div className="meander meander-march mx-auto mt-10 max-w-[12rem] text-[var(--line-strong)]" aria-hidden />
       </div>
     </PageTransition>
   );

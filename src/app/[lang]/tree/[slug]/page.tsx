@@ -36,20 +36,20 @@ export default async function TreePage({ params, searchParams }: PageProps<"/[la
     <PageTransition>
       <header>
         <p className="label kicker">{dict.tree.title}</p>
-        <h1 className="display mt-4 text-gilded">{subject.name}</h1>
-        <p className="lede mt-4">
+        <h1 className="display mt-2">{subject.name}</h1>
+        <p className="lede mt-2">
           {dict.tree.lede}{" "}
           <EntityLink entity={subject} slug={slug}>{dict.tree.readEntry(subject.name)}</EntityLink>.
         </p>
       </header>
 
-      <nav className="mt-9 flex flex-wrap items-center gap-2" aria-label={dict.tree.tradition}>
+      <nav className="mt-7 flex flex-wrap items-center gap-1.5" aria-label={dict.tree.tradition}>
         <span className="label mr-2">{dict.tree.accordingTo}</span>
         <ChipLink href={href(slug, null)} active={!tradition}>{dict.tree.prevailing}</ChipLink>
         {relevant.map((k) => traditions[k] && <ChipLink key={k} href={href(slug, k)} title={traditions[k].description ?? undefined} active={tradition === k}>{traditions[k].name}</ChipLink>)}
       </nav>
 
-      <SwapTransition key={`${slug}:${tradition}`} className="mt-7">
+      <SwapTransition key={`${slug}:${tradition}`} className="mt-6">
         {tree.nodes.length > 1 ? <FamilyTree tree={tree} entities={entities} hrefFor={(s) => (s === slug ? `/wiki/${s}` : href(s))} /> : (
           <p className="stage p-10 text-center text-muted">{dict.tree.empty(subject.name)}</p>
         )}

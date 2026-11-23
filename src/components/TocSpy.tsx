@@ -22,11 +22,11 @@ export function TocSpy({ items, label }: { items: { id: string; text: string }[]
 
   return (
     <nav aria-label={label}>
-      <p className="label mb-3">{label}</p>
+      <p className="mb-2 text-[0.85rem] font-semibold">{label}</p>
       <ol className="border-l border-line font-sans text-sm">
         {items.map((t) => (
           <li key={t.id} className="relative">
-            {active === t.id && <motion.span layoutId="toc-marker" className="absolute -left-px top-0 h-full w-px bg-gold shadow-[0_0_10px_var(--gold)]" transition={{ type: "spring", stiffness: 400, damping: 34 }} />}
+            {active === t.id && <motion.span layoutId="toc-marker" className="absolute -left-px top-0 h-full w-0.5 rounded-full bg-brand" transition={{ type: "spring", stiffness: 400, damping: 34 }} />}
             <a href={`#${t.id}`} aria-current={active === t.id ? "location" : undefined} className={`block py-1.5 pl-4 transition-colors ${active === t.id ? "text-ink" : "text-muted hover:text-ink"}`}>{t.text}</a>
           </li>
         ))}

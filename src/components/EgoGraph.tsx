@@ -51,13 +51,13 @@ export function EgoGraph({ nodes, focusName, hrefFor, t }: { nodes: GraphNode[];
             <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
           </filter>
           <radialGradient id="ego-core">
-            <stop offset="0%" stopColor="var(--gold)" stopOpacity="0.35" />
-            <stop offset="100%" stopColor="var(--gold)" stopOpacity="0" />
+            <stop offset="0%" stopColor="var(--brand)" stopOpacity="0.22" />
+            <stop offset="100%" stopColor="var(--brand)" stopOpacity="0" />
           </radialGradient>
         </defs>
         <circle r={0.34 * U} fill="url(#ego-core)" />
         {[0.42, 0.62, 0.82, 1.02, 1.22].filter((ring) => ring < extent).map((ring) => (
-          <circle key={ring} r={ring * U} fill="none" stroke="var(--line)" strokeWidth={1.5} strokeDasharray="3 10" />
+          <circle key={ring} r={ring * U} fill="none" stroke="var(--line-strong)" strokeWidth={1.5} strokeDasharray="3 10" />
         ))}
 
         <AnimatePresence initial={false}>
@@ -105,15 +105,15 @@ export function EgoGraph({ nodes, focusName, hrefFor, t }: { nodes: GraphNode[];
                 aria-label={isFocus ? format(t.openEntry, { name: n.name }) : `${n.name}: ${n.label}`}
               >
                 <circle r={r * 2.2} fill="transparent" />
-                <circle r={r} fill={isFocus ? "var(--paper)" : COLOR[n.category]} stroke={isFocus ? "var(--gold)" : "var(--paper)"} strokeWidth={isFocus ? 7 : 3} filter={isFocus || hover === n.slug ? "url(#ego-glow)" : undefined} />
+                <circle r={r} fill={isFocus ? "var(--card)" : COLOR[n.category]} stroke={isFocus ? "var(--brand)" : "var(--card)"} strokeWidth={isFocus ? 7 : 3} filter={hover === n.slug && !isFocus ? "url(#ego-glow)" : undefined} />
                 <text
                   y={r + (isFocus ? 50 : crowded ? 26 : 32)}
                   textAnchor="middle"
                   fontSize={isFocus ? 50 : crowded ? 24 : 30}
                   fontWeight={isFocus ? 700 : 500}
                   fill="var(--ink)"
-                  stroke="var(--paper)"
-                  strokeOpacity={0.85}
+                  stroke="var(--surface-2)"
+                  strokeOpacity={0.9}
                   strokeWidth={8}
                   paintOrder="stroke"
                   style={{ fontFamily: "var(--font-source-serif), serif" }}
@@ -126,7 +126,7 @@ export function EgoGraph({ nodes, focusName, hrefFor, t }: { nodes: GraphNode[];
         </AnimatePresence>
       </svg>
 
-      <p className="pointer-events-none absolute left-3 top-3 min-h-10 max-w-[80%] rounded-2xl border border-line bg-[var(--glass-strong)] px-4 py-2 text-[0.95rem] backdrop-blur-xl" aria-live="polite">
+      <p className="pointer-events-none absolute left-3 top-3 min-h-10 max-w-[80%] rounded-[var(--r-ctl)] border border-line bg-card px-3.5 py-2 text-[0.9rem] shadow-[var(--shadow)]" aria-live="polite">
         {hovered && hovered.category !== "focus" ? (
           <>
             {focusName} — <span style={{ color: COLOR[hovered.category] }} className="font-semibold">{hovered.label}</span> — {hovered.name}
