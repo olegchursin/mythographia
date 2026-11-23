@@ -18,15 +18,15 @@ interface RevealProps {
 }
 
 /** Fades and lifts its children into place the first time they scroll into view. */
-export function Reveal({ children, as = "div", className, delay = 0, y = 28, id }: RevealProps) {
+export function Reveal({ children, as = "div", className, delay = 0, y = 14, id }: RevealProps) {
   const reduce = useReducedMotion();
   const Comp = motion[as] as typeof motion.div;
   return (
     <Comp
       id={id}
       className={className}
-      initial={reduce ? false : { opacity: 0, y, filter: "blur(6px)" }}
-      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      initial={reduce ? false : { opacity: 0, y }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={VIEWPORT}
       transition={{ duration: 0.85, ease: EASE, delay }}
     >
@@ -37,8 +37,8 @@ export function Reveal({ children, as = "div", className, delay = 0, y = 28, id 
 
 const container: Variants = { hidden: {}, show: { transition: { staggerChildren: 0.055, delayChildren: 0.05 } } };
 const item: Variants = {
-  hidden: { opacity: 0, y: 22, scale: 0.98 },
-  show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.7, ease: EASE } },
+  hidden: { opacity: 0, y: 10 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: EASE } },
 };
 
 /** Parent for a cascade: each <StaggerItem> follows the previous by a beat. */

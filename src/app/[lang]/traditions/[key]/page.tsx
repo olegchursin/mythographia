@@ -45,9 +45,9 @@ export default async function TraditionPage({ params }: PageProps<"/[lang]/tradi
   return (
     <PageTransition className="page max-w-[60rem]">
       <p className="label kicker"><Link href="/traditions" className="hover:text-ink">{t.traditions.title}</Link></p>
-      <h1 className="display display-sm mt-4 text-gilded">{tradition.name}</h1>
+      <h1 className="display mt-2">{tradition.name}</h1>
       <p className="label mt-3">{tradition.period} · {t.traditions.claims(claims.length)}</p>
-      <p className="mt-5 text-[1.25rem] leading-relaxed">{tradition.description}</p>
+      <p className="mt-5 font-serif text-[1.2rem] leading-relaxed">{tradition.description}</p>
       {usedSources.length > 0 && (
         <p className="mt-3 text-muted">
           {t.traditions.principalTexts}

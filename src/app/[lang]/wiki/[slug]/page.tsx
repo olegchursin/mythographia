@@ -7,7 +7,9 @@ import { ArticleBody, RichText } from "@/components/ArticleBody";
 import { EntityLink, EntityList } from "@/components/Entity";
 import { Infobox } from "@/components/Infobox";
 import { PageTransition } from "@/components/motion/PageTransition";
+import { Icon } from "@/components/icons";
 import { Reveal } from "@/components/motion/Reveal";
+import { Rail } from "@/components/Rail";
 import { TocSpy } from "@/components/TocSpy";
 import { parseArticle, plainText } from "@/lib/article";
 import type { Category } from "@/lib/graph";
@@ -15,6 +17,7 @@ import { causeOfDeath, connectionsOf, groupConnections, infoboxFacts, parentageV
 import { alternates, toLocale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { getI18n } from "@/i18n/server";
+import { kindCat } from "@/lib/kind";
 import { getEntities, getEntity, getGraph, getTimeline } from "@/lib/queries";
 
 export const generateStaticParams = async () => [...(await getEntities("en")).keys()].map((slug) => ({ slug }));
@@ -51,6 +54,10 @@ export default async function ArticlePage({ params }: PageProps<"/[lang]/wiki/[s
     .filter(Boolean)
     .sort((a, b) => a.author.localeCompare(b.author, locale));
 
+  const citedTraditions = [...new Set(connections.map((c) => c.edge.tradition).filter((k): k is string => !!k))]
+    .map((k) => traditions[k])
+    .filter(Boolean);
+
   const factions = entity.kind === "event"
     ? facts.participants
         .map((s) => entities.get(s))
@@ -80,28 +87,34 @@ export default async function ArticlePage({ params }: PageProps<"/[lang]/wiki/[s
   return (
     <PageTransition>
     <article>
-      <header className="relative mb-12 pb-10">
+      <header className={`tile mb-10 grid items-center gap-5 p-5 sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-7 sm:p-7 ${kindCat(entity.kind)}`}>
         {entity.image ? (
-          <Image src={entity.image} alt="" width={640} height={600} sizes="(min-width: 640px) 420px, 260px" className="hero-art pointer-events-none absolute -top-6 right-0 h-[15rem] w-auto select-none sm:h-[21rem]" aria-hidden />
+          <span className="media-tint grid size-36 place-items-center overflow-hidden rounded-[var(--r-card)] sm:size-48">
+            <Image src={entity.image} alt="" width={640} height={600} sizes="192px" className="h-[92%] w-auto object-contain" aria-hidden />
+          </span>
         ) : (
-          <div className="pointer-events-none absolute -top-10 right-0 select-none text-[13rem] leading-none opacity-[0.07] sm:text-[18rem]" aria-hidden>{entity.emoji}</div>
+          <span className="glyph-tile size-24 rounded-[var(--r-card)] text-[3.25rem] sm:size-36 sm:text-[4.5rem]" aria-hidden>{entity.emoji ?? "❖"}</span>
         )}
-        <p className="label kicker">{t.subtype[entity.subtype] ?? entity.subtype} · {t.kind[entity.kind] ?? entity.kind}</p>
-        <ViewTransition name={`entity-${slug}`} share="morph" default="none">
-          <h1 className="display mt-4 inline-block text-gilded">{entity.name}</h1>
-        </ViewTransition>
-        {entity.epithet && <p className="mt-3 text-2xl italic text-muted">{entity.epithet}</p>}
-        <div className="mt-7 flex flex-wrap gap-2">
-          <Link href={`/graph?focus=${slug}`} className="chip">{t.wiki.relations}</Link>
-          {isPerson && <Link href={`/tree/${slug}`} className="chip">{t.wiki.familyTree}</Link>}
-          <Link href={`/kinship?from=${slug}`} className="chip">{t.wiki.kinship}</Link>
+        <div className="min-w-0">
+          <p className="flex flex-wrap gap-1.5">
+            <span className="chip bg-card capitalize">{t.subtype[entity.subtype] ?? entity.subtype}</span>
+            <span className="chip bg-card">{t.kind[entity.kind] ?? entity.kind}</span>
+          </p>
+          <ViewTransition name={`entity-${slug}`} share="morph" default="none">
+            <h1 className="display mt-3 inline-block">{entity.name}</h1>
+          </ViewTransition>
+          {entity.epithet && <p className="mt-1.5 font-serif text-xl italic text-muted">{entity.epithet}</p>}
+          <div className="mt-5 flex flex-wrap gap-2">
+            <Link href={`/graph?focus=${slug}`} className="btn btn-ink"><Icon name="graph" className="size-4" />{label(t.wiki.relations)}</Link>
+            {isPerson && <Link href={`/tree/${slug}`} className="btn border border-line bg-card hover:bg-hover"><Icon name="tree" className="size-4" />{label(t.wiki.familyTree)}</Link>}
+            <Link href={`/kinship?from=${slug}`} className="btn border border-line bg-card hover:bg-hover"><Icon name="kinship" className="size-4" />{label(t.wiki.kinship)}</Link>
+          </div>
         </div>
-        <div className="meander absolute inset-x-0 bottom-0 opacity-60" />
       </header>
 
-      <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_330px]">
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-12">
         <div className="min-w-0 lg:order-1">
-          {entity.summary && <p className="mb-8 text-[1.35rem] leading-relaxed"><RichText text={entity.summary} entities={entities} /></p>}
+          {entity.summary && <p className="mb-8 font-serif text-[1.25rem] leading-relaxed"><RichText text={entity.summary} entities={entities} /></p>}
 
           {blocks.length > 0 ? (
             <ArticleBody blocks={blocks} entities={entities} />
@@ -128,7 +141,7 @@ export default async function ArticlePage({ params }: PageProps<"/[lang]/wiki/[s
                           </td>
                           <td>
                             {trad ? <Link href={`/traditions/${trad.key}`} className="wikilink">{trad.name}</Link> : <span className="text-muted">{t.wiki.general}</span>}
-                            {v.certainty !== "canonical" && <span className="ml-1.5 font-sans text-xs text-gold">({t.certainty[v.certainty]})</span>}
+                            {v.certainty !== "canonical" && <span className="ml-1.5 font-sans text-xs text-brand">({t.certainty[v.certainty]})</span>}
                           </td>
                           <td className="text-sm">{v.citation ?? (v.sourceRef && sources[v.sourceRef] ? `${sources[v.sourceRef].author}, ${sources[v.sourceRef].work}` : "—")}</td>
                         </tr>
@@ -171,7 +184,7 @@ export default async function ArticlePage({ params }: PageProps<"/[lang]/wiki/[s
               <h2 id="chronology" className="section-title">{t.wiki.chronology}</h2>
               <ol className="ml-2 space-y-4 border-l border-line">
                 {timeline.map((step) => (
-                  <li key={step.id} className="relative pl-7 before:absolute before:-left-[4.5px] before:top-[0.7em] before:size-2 before:rounded-full before:bg-gold before:shadow-[0_0_10px_var(--gold)]">
+                  <li key={step.id} className="relative pl-7 before:absolute before:-left-[4.5px] before:top-[0.7em] before:size-2 before:rounded-full before:bg-brand">
                     {step.label}
                     {step.event_slug && entities.get(step.event_slug) && <> (<EntityLink entity={entities.get(step.event_slug)} slug={step.event_slug} />)</>}
                   </li>
@@ -197,20 +210,24 @@ export default async function ArticlePage({ params }: PageProps<"/[lang]/wiki/[s
           {seeAlso.length > 0 && (
             <Reveal as="section" className="mt-16">
               <h2 className="section-title">{t.wiki.seeAlso}</h2>
-              <ul className="grid gap-3 sm:grid-cols-2">
+              <Rail prev={t.shell.prev} next={t.shell.next}>
                 {seeAlso.map((s) => entities.get(s)).filter((e) => !!e).map((e) => (
-                  <li key={e.slug}>
-                    <Link href={`/wiki/${e.slug}`} transitionTypes={["nav-forward"]} className="card card-hover group flex items-center gap-4 p-4">
-                      <span className="grid size-11 shrink-0 place-items-center rounded-full border border-line bg-glass text-xl" aria-hidden>{e.emoji ?? "·"}</span>
-                      <span className="min-w-0">
-                        <span className="block font-semibold transition-colors group-hover:text-gold">{e.name}</span>
-                        <span className="block truncate text-sm text-muted">{e.epithet ?? t.subtype[e.subtype] ?? e.subtype}</span>
-                      </span>
-                    </Link>
-                  </li>
+                  <Link key={e.slug} href={`/wiki/${e.slug}`} transitionTypes={["nav-forward"]} className={`card card-hover group flex w-56 items-center gap-3 p-3 ${kindCat(e.kind)}`}>
+                    <span className="glyph-tile size-11 text-xl" aria-hidden>{e.emoji ?? "·"}</span>
+                    <span className="min-w-0">
+                      <span className="block truncate font-medium transition-colors group-hover:text-brand">{e.name}</span>
+                      <span className="block truncate text-[0.82rem] text-muted">{e.epithet ?? t.subtype[e.subtype] ?? e.subtype}</span>
+                    </span>
+                  </Link>
                 ))}
-              </ul>
+              </Rail>
             </Reveal>
+          )}
+
+          {citedTraditions.length > 0 && (
+            <p className="mt-10 flex flex-wrap gap-1.5">
+              {citedTraditions.map((tr) => <Link key={tr.key} href={`/traditions/${tr.key}`} className="chip">{tr.name}</Link>)}
+            </p>
           )}
         </div>
 
@@ -219,8 +236,6 @@ export default async function ArticlePage({ params }: PageProps<"/[lang]/wiki/[s
             title={entity.name}
             label={t.entity.quickFacts(entity.name)}
             subtitle={entity.epithet}
-            glyph={entity.emoji}
-            image={entity.image}
             rows={[
               { label: t.wiki.rows.type, value: <span className="capitalize">{t.subtype[entity.subtype] ?? entity.subtype}</span> },
               { label: t.wiki.rows.aliases, value: entity.aliases.length ? entity.aliases.join(", ") : null },
@@ -246,7 +261,7 @@ export default async function ArticlePage({ params }: PageProps<"/[lang]/wiki/[s
           />
 
           {toc.length > 2 && (
-            <div className="hidden lg:sticky lg:top-28 lg:block"><TocSpy items={toc} label={t.toc.contents} /></div>
+            <div className="hidden lg:sticky lg:top-[calc(var(--safe-t)+5rem)] lg:block"><TocSpy items={toc} label={t.toc.contents} /></div>
           )}
         </div>
       </div>
@@ -270,7 +285,7 @@ function RelationsTable({ groups, graph, t }: { groups: RoleGroup[]; graph: Grap
                 <td className="text-muted">{i === 0 ? <span className="first-letter:uppercase inline-block">{g.label}</span> : ""}</td>
                 <td>
                   <EntityLink entity={entities.get(item.other)} slug={item.other} />
-                  {item.contested && <span className="ml-1.5 font-sans text-xs text-gold">{t.wiki.disputed}</span>}
+                  {item.contested && <span className="ml-1.5 font-sans text-xs text-brand">{t.wiki.disputed}</span>}
                   {item.note && <div className="text-sm text-muted"><RichText text={item.note} entities={entities} /></div>}
                 </td>
                 <td className="text-sm">
@@ -298,3 +313,6 @@ function AssociationLists({ groups, graph }: { groups: RoleGroup[]; graph: Graph
     </dl>
   );
 }
+
+/** Action labels carry a leading glyph ("✳ Relations"); the buttons draw their own icon. */
+const label = (s: string) => s.replace(/^[^\p{L}]+/u, "");

@@ -43,7 +43,7 @@ export async function FamilyTree({ tree, entities, hrefFor }: { tree: Tree; enti
           if (!p || !c) return null;
           const x1 = p.x + W / 2, y1 = p.y + H, x2 = c.x + W / 2, y2 = c.y;
           const my = (y1 + y2) / 2;
-          return <path key={l.parent + l.child} d={`M${x1} ${y1} C${x1} ${my}, ${x2} ${my}, ${x2} ${y2}`} fill="none" stroke={l.contested ? "var(--muted)" : "var(--gold)"} strokeOpacity={l.contested ? 0.5 : 0.45} strokeWidth={1.3} {...(l.contested ? { strokeDasharray: "5 4" } : { pathLength: 1, className: "draw", style: { "--i": i } as React.CSSProperties })} />;
+          return <path key={l.parent + l.child} d={`M${x1} ${y1} C${x1} ${my}, ${x2} ${my}, ${x2} ${y2}`} fill="none" stroke={l.contested ? "var(--muted)" : "var(--brand)"} strokeOpacity={l.contested ? 0.5 : 0.5} strokeWidth={1.3} {...(l.contested ? { strokeDasharray: "5 4" } : { pathLength: 1, className: "draw", style: { "--i": i } as React.CSSProperties })} />;
         })}
 
         {tree.nodes.map((n, i) => {
@@ -54,8 +54,8 @@ export async function FamilyTree({ tree, entities, hrefFor }: { tree: Tree; enti
           return (
             <Link key={n.slug} href={hrefFor(n.slug)} scroll={false} className="tree-node pop" style={{ "--i": i } as React.CSSProperties}>
               <title>{e?.epithet ? `${name} — ${e.epithet}` : name}</title>
-              <rect x={p.x} y={p.y} width={W} height={H} rx={H / 2} fill={focus ? "var(--gold)" : "var(--surface-2)"} stroke={focus ? "var(--gold)" : "var(--line)"} strokeWidth={1.2} />
-              <text x={p.x + W / 2} y={p.y + H / 2 + 5} textAnchor="middle" fontSize={14} fontWeight={focus ? 700 : 500} fill={focus ? "#171208" : "var(--ink)"} style={{ fontFamily: "var(--font-source-serif), serif" }}>
+              <rect x={p.x} y={p.y} width={W} height={H} rx={12} fill={focus ? "var(--brand)" : "var(--card)"} stroke={focus ? "var(--brand)" : "var(--line-strong)"} strokeWidth={1} />
+              <text x={p.x + W / 2} y={p.y + H / 2 + 5} textAnchor="middle" fontSize={14} fontWeight={focus ? 600 : 500} fill={focus ? "var(--on-brand)" : "var(--ink)"} style={{ fontFamily: "var(--font-source-serif), serif" }}>
                 {name.length > 17 ? name.slice(0, 16) + "…" : name}
               </text>
             </Link>

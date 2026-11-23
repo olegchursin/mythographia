@@ -13,7 +13,7 @@ export function LanguageSwitch({ label, className = "" }: { label: string; class
   const current = useLocale();
 
   return (
-    <nav aria-label={label} className={`flex h-10 items-center rounded-full border border-line bg-glass p-1 font-sans text-xs tracking-wide ${className}`}>
+    <nav aria-label={label} className={`flex h-9 items-center rounded-[var(--r-ctl)] bg-hover p-0.5 font-sans text-xs font-medium ${className}`}>
       {locales.map((l) => (
         <a
           key={l}
@@ -28,7 +28,7 @@ export function LanguageSwitch({ label, className = "" }: { label: string; class
             e.currentTarget.search = location.search;
             e.currentTarget.hash = location.hash;
           }}
-          className={`grid h-full place-items-center rounded-full px-2.5 transition-colors ${l === current ? "bg-gold/15 text-gold" : "text-muted hover:text-ink"}`}
+          className={`grid h-full flex-1 place-items-center rounded-[8px] px-2.5 transition-colors ${l === current ? "bg-card text-ink shadow-sm" : "text-muted hover:text-ink"}`}
         >
           {SHORT[l]}
         </a>

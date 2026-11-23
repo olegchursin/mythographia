@@ -30,9 +30,9 @@ export default async function SourcePage({ params }: PageProps<"/[lang]/sources/
   return (
     <PageTransition className="page max-w-[60rem]">
       <p className="label kicker"><Link href="/sources" className="hover:text-ink">{t.sources.title}</Link></p>
-      <h1 className="display display-sm mt-4 text-gilded"><span className="italic">{source.work}</span></h1>
-      <p className="mt-3 text-xl text-muted">{source.author}{source.period && ` · ${source.period}`}</p>
-      {source.summary && <p className="mt-5 text-[1.25rem] leading-relaxed">{source.summary}</p>}
+      <h1 className="display mt-2 italic">{source.work}</h1>
+      <p className="mt-2 font-serif text-xl text-muted">{source.author}{source.period && ` · ${source.period}`}</p>
+      {source.summary && <p className="mt-5 font-serif text-[1.2rem] leading-relaxed">{source.summary}</p>}
       <p className="mt-3 font-sans text-sm text-muted">
         {entry && <>{t.sources.entry}<EntityLink entity={entry} slug={entry.slug} /> · </>}
         {trads.length > 0 && <>{t.sources.tradition}{trads.map((k, i) => <span key={k}>{i > 0 && ", "}<Link href={`/traditions/${k}`} className="wikilink">{traditions[k]?.name}</Link></span>)}</>}

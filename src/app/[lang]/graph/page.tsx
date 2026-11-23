@@ -66,21 +66,21 @@ export default async function GraphPage({ searchParams }: PageProps<"/[lang]/gra
     <PageTransition>
       <header>
         <p className="label kicker">{t.graph.title}</p>
-        <h1 className="display mt-4 text-gilded">{focus.name}</h1>
-        <p className="lede mt-4">
+        <h1 className="display mt-2">{focus.name}</h1>
+        <p className="lede mt-2">
           {fill(t.graph.lede, { count: t.graph.figures(neighbours.length), focus: <EntityLink entity={focus} slug={focusSlug} /> })}
         </p>
       </header>
 
-      <div className="mt-9 space-y-3">
+      <div className="mt-7 space-y-2.5">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="label mr-2 w-24">{t.graph.show}</span>
+          <span className="label mr-1 w-24 shrink-0">{t.graph.show}</span>
           {CATEGORIES.map((k) => {
             const on = cats.includes(k.key);
             const next = on ? cats.filter((c) => c !== k.key) : CATEGORIES.map((c) => c.key).filter((c) => cats.includes(c) || c === k.key);
             return (
               <ChipLink key={k.key} href={href({ cats: next })} active={on} className={`cat-${k.key}`}>
-                <span className={`inline-block size-2 rounded-full ${on ? "bg-(--cat) shadow-[0_0_8px_var(--cat)]" : "border border-(--cat)"}`} />
+                <span className={`inline-block size-2 rounded-full ${on ? "bg-(--cat)" : "border border-(--cat)"}`} />
                 {t.graph.categories[k.key]}
               </ChipLink>
             );
@@ -88,14 +88,14 @@ export default async function GraphPage({ searchParams }: PageProps<"/[lang]/gra
         </div>
         {usedTraditions.length > 0 && (
           <div className="flex flex-wrap items-center gap-2">
-            <span className="label mr-2 w-24">{t.graph.accordingTo}</span>
+            <span className="label mr-1 w-24 shrink-0">{t.graph.accordingTo}</span>
             <ChipLink href={href({ t: null })} active={!tradition}>{t.graph.allSources}</ChipLink>
             {usedTraditions.map((k) => traditions[k] && <ChipLink key={k} href={href({ t: k })} active={tradition === k}>{traditions[k].name}</ChipLink>)}
           </div>
         )}
       </div>
 
-      <Reveal className="stage mt-7 p-2 sm:p-4" y={40}>
+      <Reveal className="stage mt-6 p-2 sm:p-4">
         {neighbours.length ? <EgoGraph nodes={nodes} focusName={focus.name} hrefFor={hrefFor} t={t.ego} /> : <p className="p-16 text-center text-muted">{t.graph.empty}</p>}
       </Reveal>
 

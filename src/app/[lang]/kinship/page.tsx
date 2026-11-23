@@ -51,20 +51,20 @@ export default async function KinshipPage({ searchParams }: PageProps<"/[lang]/k
     <PageTransition className="page page-narrow space-y-10">
       <header className="text-center">
         <p className="label kicker inline-block">{k.kicker}</p>
-        <h1 className="display mt-4">{k.titleStart}<span className="text-gilded">{k.titleGild}</span></h1>
-        <p className="lede mx-auto mt-4">{k.lede}</p>
+        <h1 className="display mt-2">{k.titleStart}{k.titleGild}</h1>
+        <p className="lede mx-auto mt-3">{k.lede}</p>
       </header>
 
       <form action={localeHref(locale, "/kinship")} className="card p-5 sm:p-7">
         <div className="grid items-end gap-4 sm:grid-cols-[1fr_auto_1fr]">
           {(["from", "to"] as const).map((name, i) => (
-            <label key={name} className={`label block ${i === 1 ? "sm:order-3" : ""}`}>
+            <label key={name} className={`label block text-[0.85rem] ${i === 1 ? "sm:order-3" : ""}`}>
               {i === 0 ? k.first : k.second}
               <input name={name} list="figures" required defaultValue={[a, b][i]?.name ?? (typeof params[name] === "string" ? (params[name] as string) : "")} placeholder={i === 0 ? k.firstPlaceholder : k.secondPlaceholder} autoComplete="off"
-                className="input mt-2 normal-case tracking-normal" />
+                className="input mt-1.5" />
             </label>
           ))}
-          <span className="hidden pb-3 text-2xl text-gold sm:order-2 sm:block" aria-hidden>⟷</span>
+          <span className="hidden pb-2.5 text-xl text-brand sm:order-2 sm:block" aria-hidden>⟷</span>
         </div>
         <datalist id="figures">{options.map((e) => <option key={e.slug} value={e.name} />)}</datalist>
         <button className="btn btn-primary mt-5 w-full">{k.submit}</button>
@@ -81,7 +81,7 @@ export default async function KinshipPage({ searchParams }: PageProps<"/[lang]/k
             return (
               <Reveal as="section" key={kn.slug}>
                 <h2 className="section-title">{direct ? k.lineOfDescent : k.commonAncestor}</h2>
-                <p className="mb-6 text-[1.15rem]">
+                <p className="mb-6 font-serif text-[1.15rem]">
                   {direct
                     ? fill(k.direct, {
                         desc: <EntityLink entity={kn.slug === a.slug ? b : a} slug={kn.slug === a.slug ? b.slug : a.slug} />,
@@ -91,7 +91,7 @@ export default async function KinshipPage({ searchParams }: PageProps<"/[lang]/k
                     : fill(k.shared, {
                         a: <EntityLink entity={a} slug={a.slug} />,
                         b: <EntityLink entity={b} slug={b.slug} />,
-                        term: <strong className="text-gilded">{kinshipTerm(kn.depthA, kn.depthB, locale)}</strong>,
+                        term: <strong className="text-brand">{kinshipTerm(kn.depthA, kn.depthB, locale)}</strong>,
                         anc: <EntityLink entity={ancestor} slug={kn.slug} />,
                         ga: k.gens(kn.depthA),
                         gb: k.gens(kn.depthB),

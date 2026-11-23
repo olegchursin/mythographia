@@ -24,13 +24,21 @@ export function HeroConstellation({ names }: { names: string[] }) {
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
     const pointer = { x: -9999, y: -9999 };
     let w = 0, h = 0, raf = 0, visible = true, stars: Star[] = [];
-    let gold = "227,193,111", ink = "242,234,217", font = "system-ui";
+    let gold = "185,71,42", ink = "24,23,26", font = "system-ui";
 
+    // Colours come from the theme tokens; the canvas normalises any CSS colour to #rrggbb.
+    const rgb = (value: string, fallback: string) => {
+      ctx.fillStyle = "#000";
+      ctx.fillStyle = value || "#000";
+      const hex = String(ctx.fillStyle);
+      if (!/^#[0-9a-f]{6}$/i.test(hex) || !value) return fallback;
+      return [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(",");
+    };
     const readTheme = () => {
-      const light = document.documentElement.dataset.theme === "light";
-      gold = light ? "143,109,16" : "227,193,111";
-      ink = light ? "31,27,22" : "242,234,217";
-      font = getComputedStyle(document.documentElement).getPropertyValue("--font-geist-sans").trim() || "system-ui";
+      const css = getComputedStyle(document.documentElement);
+      gold = rgb(css.getPropertyValue("--brand").trim(), gold);
+      ink = rgb(css.getPropertyValue("--ink").trim(), ink);
+      font = css.getPropertyValue("--font-geist-sans").trim() || "system-ui";
     };
 
     const seed = () => {
@@ -77,7 +85,7 @@ export function HeroConstellation({ names }: { names: string[] }) {
           const d = Math.hypot(a.x - b.x, a.y - b.y);
           if (d > LINK) continue;
           const near = Math.max(0, 1 - Math.hypot((a.x + b.x) / 2 - pointer.x, (a.y + b.y) / 2 - pointer.y) / 260);
-          ctx.strokeStyle = `rgba(${gold},${(1 - d / LINK) * (0.13 + near * 0.55)})`;
+          ctx.strokeStyle = `rgba(${gold},${(1 - d / LINK) * (0.1 + near * 0.45)})`;
           ctx.beginPath();
           ctx.moveTo(a.x, a.y);
           ctx.lineTo(b.x, b.y);
@@ -96,12 +104,12 @@ export function HeroConstellation({ names }: { names: string[] }) {
       for (const s of stars) {
         const twinkle = 0.55 + Math.sin(t / 900 + s.tw) * 0.35;
         const near = Math.max(0, 1 - Math.hypot(s.x - pointer.x, s.y - pointer.y) / 220);
-        ctx.fillStyle = `rgba(${s.name || s.r > 2 ? gold : ink},${Math.min(1, twinkle + near)})`;
+        ctx.fillStyle = `rgba(${s.name || s.r > 2 ? gold : ink},${Math.min(1, (twinkle + near) * (s.name || s.r > 2 ? 0.9 : 0.4))})`;
         ctx.beginPath();
         ctx.arc(s.x, s.y, s.r + near * 1.6, 0, Math.PI * 2);
         ctx.fill();
         if (s.name) {
-          ctx.fillStyle = `rgba(${ink},${0.2 + near * 0.75})`;
+          ctx.fillStyle = `rgba(${ink},${0.28 + near * 0.6})`;
           ctx.fillText(s.name.toUpperCase(), s.x + 9, s.y + 4);
         }
       }
@@ -132,6 +140,12 @@ export function HeroConstellation({ names }: { names: string[] }) {
       if (reduce) draw(0);
     });
     mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    const mq = matchMedia("(prefers-color-scheme: dark)");
+    const onScheme = () => {
+      readTheme();
+      if (reduce) draw(0);
+    };
+    mq.addEventListener("change", onScheme);
     window.addEventListener("pointermove", onMove);
     document.documentElement.addEventListener("pointerleave", onLeave);
     if (!reduce) raf = requestAnimationFrame(loop);
@@ -141,10 +155,11 @@ export function HeroConstellation({ names }: { names: string[] }) {
       ro.disconnect();
       io.disconnect();
       mo.disconnect();
+      mq.removeEventListener("change", onScheme);
       window.removeEventListener("pointermove", onMove);
       document.documentElement.removeEventListener("pointerleave", onLeave);
     };
   }, [names]);
 
-  return <canvas ref={ref} aria-hidden className="absolute inset-0 size-full [mask-image:radial-gradient(90%_80%_at_50%_45%,#000_35%,transparent)]" />;
+  return <canvas ref={ref} aria-hidden className="absolute inset-0 -z-10 size-full opacity-70 [mask-image:radial-gradient(90%_80%_at_50%_45%,#000_30%,transparent)]" />;
 }
